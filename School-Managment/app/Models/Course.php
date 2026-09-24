@@ -106,17 +106,15 @@ class Course extends Model
     }
 
     /**
-     * Free spots as a text meter, e.g. "#########-" (all "#" when there is no limit).
+     * Share of free spots, from 0 to 1 (1 when there is no limit).
      */
-    public function seatMeter(int $width = 10): string
+    public function freeRatio(): float
     {
         if (!$this->capacity) {
-            return str_repeat('#', $width);
+            return 1.0;
         }
 
-        $lit = (int) round($this->available_spots / $this->capacity * $width);
-
-        return str_repeat('#', $lit).str_repeat('-', $width - $lit);
+        return $this->available_spots / $this->capacity;
     }
 
     /**

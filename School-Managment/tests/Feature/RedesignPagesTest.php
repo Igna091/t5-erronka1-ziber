@@ -51,6 +51,23 @@ class RedesignPagesTest extends TestCase
         $this->get(route('home'))->assertOk()->assertSee('2/3');
     }
 
+    public function test_seat_bar_shrinks_with_taken_spots_and_warns_when_almost_full(): void
+    {
+        $roomy = Course::create(['name' => 'Amplio', 'code' => 'AM-1', 'status' => 'active', 'capacity' => 4]);
+        $almostFull = Course::create(['name' => 'Casi lleno', 'code' => 'CL-1', 'status' => 'active', 'capacity' => 10]);
+        Enrollment::create(['student_id' => $this->user(Role::STUDENT, 'a@educenter.es')->id, 'course_id' => $roomy->id, 'status' => 'active']);
+        for ($i = 0; $i < 9; $i++) {
+            Enrollment::create(['student_id' => $this->user(Role::STUDENT, "b{$i}@educenter.es")->id, 'course_id' => $almostFull->id, 'status' => 'active']);
+        }
+
+        $html = $this->get(route('courses.index'))->assertOk()->getContent();
+
+        // 3 of 4 free -> 75%, 1 of 10 free -> 10% and orange
+        $this->assertStringContainsString('--w: 75%', $html);
+        $this->assertStringContainsString('--w: 10%', $html);
+        $this->assertSame(1, substr_count($html, 'seatbar is-low'));
+    }
+
     public function test_enrolled_student_sees_enrolled_state_in_course_browser(): void
     {
         $student = $this->user(Role::STUDENT, 'maria@educenter.es');

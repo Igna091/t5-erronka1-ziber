@@ -18,7 +18,7 @@
                 <span class="ls__code">{{ $course->code }}</span>
                 <span class="ls__name">{{ $course->slug }}</span>
                 <span>{{ $course->duration_hours ? $course->duration_hours.'h' : '—' }}</span>
-                <span class="ascii col-meter" aria-hidden="true">[{{ $course->seatMeter() }}]</span>
+                <x-seatbar :course="$course" class="col-meter" />
                 <span class="col-free">
                     @if ($course->capacity)
                         <span class="sr-only">plazas libres:</span>{{ $course->available_spots }}/{{ $course->capacity }}
@@ -32,7 +32,9 @@
 
     <div>
         @foreach ($courses as $course)
-            @php($enrolled = in_array($course->id, $enrolledIds, true))
+            @php
+                $enrolled = in_array($course->id, $enrolledIds, true);
+            @endphp
             <article class="panel panel--float course-panel" id="course-panel-{{ $course->id }}" @unless($loop->first) hidden @endunless aria-labelledby="course-panel-title-{{ $course->id }}">
                 <x-pads />
                 <div class="panel__row"><span class="lbl">ficha del curso</span><span class="lbl">{{ $course->code }}</span></div>
