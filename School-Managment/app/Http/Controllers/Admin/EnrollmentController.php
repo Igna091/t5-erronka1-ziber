@@ -19,15 +19,23 @@ class EnrollmentController extends Controller
      */
     public function index(Request $request)
     {
+        $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+            'status' => ['nullable', Rule::in(['active', 'cancelled'])],
+        ]);
+
         $query = Enrollment::with(['student', 'course']);
 
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->whereHas('student', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('surname', 'like', "%{$search}%");
-            })->orWhereHas('course', function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
+            $search = $request->string('search')->toString();
+            // Grouped so the OR doesn't bypass the status filter below
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('student', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('surname', 'like', "%{$search}%");
+                })->orWhereHas('course', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
             });
         }
 

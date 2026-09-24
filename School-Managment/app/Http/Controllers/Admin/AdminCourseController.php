@@ -15,12 +15,17 @@ class AdminCourseController extends Controller
      */
     public function index(Request $request)
     {
+        $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+            'status' => ['nullable', Rule::in(['active', 'inactive'])],
+        ]);
+
         $query = Course::withCount(['enrollments' => function ($q) {
             $q->where('status', 'active');
         }]);
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = $request->string('search')->toString();
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('code', 'like', "%{$search}%");

@@ -92,6 +92,16 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ==========================================
+    // Filters that submit their form on change
+    // (no inline onchange="" so the Content-Security-Policy can block inline JS)
+    // ==========================================
+    document.querySelectorAll('[data-auto-submit]').forEach(function (field) {
+        field.addEventListener('change', function () {
+            if (field.form) field.form.submit();
+        });
+    });
+
+    // ==========================================
     // Auto-hide flash messages
     // ==========================================
     document.querySelectorAll('.alert[data-auto-hide]').forEach(function (alert) {

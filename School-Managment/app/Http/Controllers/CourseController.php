@@ -31,6 +31,14 @@ class CourseController extends Controller
      */
     public function show(Course $course)
     {
+        // Inactive courses are hidden, except for admins and students enrolled in them
+        if (!$course->isActive()) {
+            $user = Auth::user();
+            $canSee = $user && ($user->isAdmin() || $course->enrollments()->where('student_id', $user->id)->exists());
+
+            abort_unless($canSee, 404);
+        }
+
         $course->loadCount(['enrollments' => function ($query) {
             $query->where('status', 'active');
         }]);

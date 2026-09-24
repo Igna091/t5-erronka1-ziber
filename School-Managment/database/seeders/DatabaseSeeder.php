@@ -10,6 +10,7 @@ use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use RuntimeException;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,6 +21,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Demo data with known passwords (admin@educenter.es / password): never in production
+        if (app()->isProduction()) {
+            throw new RuntimeException('DatabaseSeeder crea usuarios de prueba con contraseñas conocidas y no se puede ejecutar en producción.');
+        }
+
         // Roles are created by the roles migration
         $roles = Role::pluck('id', 'name');
 
