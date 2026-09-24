@@ -60,9 +60,42 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        return back()->withErrors([
-            'email' => 'Función de registro deshabilitada (Modo solo diseño).',
+        $request->merge(['dni' => strtoupper(trim((string) $request->input('dni')))]);
+
+        $validated = $request->validate([
+            'email' => ['required', 'email', 'max:255'],
+            'dni' => ['required', 'string', 'max:20'],
+            'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
         ]);
+
+        $user = User::students()
+            ->where('email', $validated['email'])
+            ->where('dni', $validated['dni'])
+            ->first();
+
+        if (!$user) {
+            return back()->withErrors([
+                'email' => 'No existe ningún alumno con ese email y DNI. Contacta con administración.',
+            ])->onlyInput('email', 'dni');
+        }
+
+        if ($user->is_registered) {
+            return back()->withErrors([
+                'email' => 'Esta cuenta ya está activada. Inicia sesión.',
+            ])->onlyInput('email', 'dni');
+        }
+
+        // Hashed with the configured driver (argon2id, see config/hashing.php)
+        $user->forceFill([
+            'password' => Hash::make($validated['password']),
+            'is_registered' => true,
+        ])->save();
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect()->route('courses.index')
+            ->with('success', 'Cuenta activada correctamente. ¡Bienvenido/a!');
     }
 
     /**
