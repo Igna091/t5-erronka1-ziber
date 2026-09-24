@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class StudentController extends Controller
 {
@@ -54,8 +56,33 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        return redirect()->route('admin.students.index')
-            ->with('success', 'Función de creación deshabilitada (Modo solo diseño).');
+        $request->merge([
+            'dni' => strtoupper(trim((string) $request->input('dni'))),
+            'email' => strtolower(trim((string) $request->input('email'))),
+        ]);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+            'surname' => ['required', 'string', 'max:150'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'dni' => ['required', 'string', 'max:20', 'unique:users,dni'],
+            'phone' => ['nullable', 'string', 'max:20'],
+        ], [
+            'email.unique' => 'Ya existe un usuario con este email.',
+            'dni.unique' => 'Ya existe un usuario con este DNI.',
+        ]);
+
+        // The student sets their own password when activating the account in /register.
+        // Until then, a random unknown password (hashed with argon2id) blocks the login.
+        $student = User::create([
+            ...$validated,
+            'password' => Str::password(32),
+            'role_id' => Role::where('name', Role::STUDENT)->value('id'),
+            'is_registered' => false,
+        ]);
+
+        return redirect()->route('admin.students.show', $student)
+            ->with('success', 'Alumno creado. Ya puede activar su cuenta en el registro con su email y DNI.');
     }
 
     /**
