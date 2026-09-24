@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -24,26 +28,42 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
+            'email' => ['required', 'email', 'max:255'],
+            'password' => ['required', 'string'],
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
+        // Max 5 failed attempts per email + IP, then locked for 1 minute
+        $throttleKey = Str::lower($credentials['email']).'|'.$request->ip();
 
-            $user = Auth::user();
-
-            // Redirect admin to admin panel, students to courses
-            if ($user->isAdmin()) {
-                return redirect()->intended('/administracion');
-            }
-
-            return redirect()->intended('/cursos');
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            throw ValidationException::withMessages([
+                'email' => 'Demasiados intentos. Inténtalo de nuevo en '.RateLimiter::availableIn($throttleKey).' segundos.',
+            ]);
         }
 
-        return back()->withErrors([
-            'email' => 'Las credenciales proporcionadas no son correctas.',
-        ])->onlyInput('email');
+        // Only activated accounts can log in
+        $attempt = [
+            ...$credentials,
+            fn (Builder $query) => $query->where('is_registered', true),
+        ];
+
+        if (!Auth::attempt($attempt, $request->boolean('remember'))) {
+            RateLimiter::hit($throttleKey, 60);
+
+            return back()->withErrors([
+                'email' => 'Las credenciales no son correctas o la cuenta aún no está activada.',
+            ])->onlyInput('email', 'remember');
+        }
+
+        RateLimiter::clear($throttleKey);
+        $request->session()->regenerate();
+
+        // Redirect admin to admin panel, students and teachers to courses
+        if (Auth::user()->isAdmin()) {
+            return redirect()->intended(route('admin.dashboard'));
+        }
+
+        return redirect()->intended(route('courses.index'));
     }
 
     /**
