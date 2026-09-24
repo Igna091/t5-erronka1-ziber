@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
@@ -57,21 +58,7 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        $request->merge([
-            'dni' => strtoupper(trim((string) $request->input('dni'))),
-            'email' => strtolower(trim((string) $request->input('email'))),
-        ]);
-
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:100'],
-            'surname' => ['required', 'string', 'max:150'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'dni' => ['required', 'string', 'max:20', 'unique:users,dni'],
-            'phone' => ['nullable', 'string', 'max:20'],
-        ], [
-            'email.unique' => 'Ya existe un usuario con este email.',
-            'dni.unique' => 'Ya existe un usuario con este DNI.',
-        ]);
+        $validated = $this->validateStudent($request);
 
         // The student sets their own password when activating the account in /register.
         // Until then, a random unknown password (hashed with argon2id) blocks the login.
@@ -117,8 +104,38 @@ class StudentController extends Controller
      */
     public function update(Request $request, User $student)
     {
-        return redirect()->route('admin.students.index')
-            ->with('success', 'Función de edición deshabilitada (Modo solo diseño).');
+        if (!$student->isStudent()) {
+            abort(404);
+        }
+
+        $student->update($this->validateStudent($request, $student));
+
+        return redirect()->route('admin.students.show', $student)
+            ->with('success', 'Datos del alumno/a actualizados correctamente.');
+    }
+
+    /**
+     * Normalize and validate the student form (create and edit).
+     *
+     * @return array<string, mixed>
+     */
+    private function validateStudent(Request $request, ?User $student = null): array
+    {
+        $request->merge([
+            'dni' => strtoupper(trim((string) $request->input('dni'))),
+            'email' => strtolower(trim((string) $request->input('email'))),
+        ]);
+
+        return $request->validate([
+            'name' => ['required', 'string', 'max:100'],
+            'surname' => ['required', 'string', 'max:150'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($student)],
+            'dni' => ['required', 'string', 'max:20', Rule::unique('users', 'dni')->ignore($student)],
+            'phone' => ['nullable', 'string', 'max:20'],
+        ], [
+            'email.unique' => 'Ya existe un usuario con este email.',
+            'dni.unique' => 'Ya existe un usuario con este DNI.',
+        ]);
     }
 
     /**
