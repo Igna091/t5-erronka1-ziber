@@ -4,7 +4,9 @@ namespace Tests\Feature;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Notifications\ActivateAccount;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class AdminCreateStudentTest extends TestCase
@@ -87,12 +89,26 @@ class AdminCreateStudentTest extends TestCase
 
     public function test_created_student_can_activate_account_and_login(): void
     {
-        $this->actingAs($this->admin())->storeStudent();
+        Notification::fake();
+
+        $this->actingAs($this->admin())->storeStudent()
+            ->assertSessionHas('success', 'Alumno creado. Le hemos enviado un email a iker@educenter.es para activar su cuenta.');
         $this->post('/logout');
 
-        $this->post('/register', [
-            'email' => 'iker@educenter.es',
-            'dni' => '11111111H',
+        $student = User::firstWhere('email', 'iker@educenter.es');
+        $url = null;
+        Notification::assertSentTo($student, ActivateAccount::class, function (ActivateAccount $notification) use (&$url) {
+            $url = $notification->url;
+
+            return true;
+        });
+
+        // Open the link from the email and choose a password
+        $this->get($url)->assertOk();
+        parse_str(parse_url($url, PHP_URL_QUERY), $query);
+        $this->post(route('activation.store'), [
+            'token' => basename(parse_url($url, PHP_URL_PATH)),
+            'email' => $query['email'],
             'password' => 'MiClave123',
             'password_confirmation' => 'MiClave123',
         ])->assertRedirect(route('courses.index'));

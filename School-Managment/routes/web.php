@@ -29,6 +29,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:register');
+
+    // Account activation (link sent by email)
+    Route::get('/activar/{token}', [AuthController::class, 'showActivate'])->name('activation.show');
+    Route::post('/activar', [AuthController::class, 'activate'])->middleware('throttle:register')->name('activation.store');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
@@ -82,6 +86,7 @@ Route::middleware(['auth', 'admin'])->prefix('administracion')->name('admin.')->
         'update' => 'students.update',
         'destroy' => 'students.destroy',
     ])->parameters(['alumnos' => 'student']);
+    Route::post('/alumnos/{student}/reenviar-activacion', [StudentController::class, 'resendActivation'])->name('students.resend-activation');
 
     // Courses CRUD
     Route::resource('cursos', AdminCourseController::class)->names([

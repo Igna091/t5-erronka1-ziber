@@ -99,6 +99,14 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+
+        // Account activation links emailed to students created by an admin
+        'activations' => [
+            'provider' => 'users',
+            'table' => 'activation_tokens',
+            'expire' => 60 * 24 * 7, // 7 days
+            'throttle' => 60, // seconds between two emails to the same student
+        ],
     ],
 
     /*

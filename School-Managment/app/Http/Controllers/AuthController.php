@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Services\AccountActivation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class AuthController extends Controller
 {
+    public const ACTIVATION_SENT_MESSAGE = 'Si existe una cuenta pendiente de activar con ese email, te hemos enviado un enlace de activación. Revisa también la carpeta de spam.';
+
+    public const INVALID_LINK_MESSAGE = 'El enlace de activación no es válido o ha caducado. Solicita uno nuevo.';
+
     /**
      * Show the login form.
      */
@@ -69,7 +73,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Show the registration form.
+     * Show the "resend activation email" form.
      */
     public function showRegister()
     {
@@ -77,46 +81,63 @@ class AuthController extends Controller
     }
 
     /**
-     * Handle registration.
-     * Only students previously created by an admin can register.
+     * Resend the activation email to a pending student.
+     * The answer is always the same, so it doesn't reveal which emails exist.
      */
-    public function register(Request $request)
+    public function register(Request $request, AccountActivation $activation)
     {
-        $request->merge([
-            'dni' => strtoupper(trim((string) $request->input('dni'))),
-            'email' => strtolower(trim((string) $request->input('email'))),
-        ]);
+        $request->merge(['email' => strtolower(trim((string) $request->input('email')))]);
 
         $validated = $request->validate([
             'email' => ['required', 'email', 'max:255'],
-            'dni' => ['required', 'string', 'max:20'],
+        ]);
+
+        if ($student = $activation->pendingStudent($validated['email'])) {
+            try {
+                $activation->send($student);
+            } catch (TransportExceptionInterface $e) {
+                report($e);
+            }
+        }
+
+        return back()->with('success', self::ACTIVATION_SENT_MESSAGE);
+    }
+
+    /**
+     * Show the form to choose a password, opened from the activation email.
+     */
+    public function showActivate(Request $request, string $token, AccountActivation $activation)
+    {
+        $email = $request->string('email')->toString();
+        $student = $activation->pendingStudent($email);
+
+        if (!$student || !$activation->isValid($student, $token)) {
+            return redirect()->route('register')->with('error', self::INVALID_LINK_MESSAGE);
+        }
+
+        return view('auth.activate', ['token' => $token, 'email' => $student->email, 'student' => $student]);
+    }
+
+    /**
+     * Activate the account with the chosen password and log the student in.
+     */
+    public function activate(Request $request, AccountActivation $activation)
+    {
+        $validated = $request->validate([
+            'token' => ['required', 'string'],
+            'email' => ['required', 'email'],
             'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
         ]);
 
-        $user = User::students()
-            ->where('email', $validated['email'])
-            ->where('dni', $validated['dni'])
-            ->first();
+        $student = $activation->pendingStudent($validated['email']);
 
-        if (!$user) {
-            return back()->withErrors([
-                'email' => 'No existe ningún alumno con ese email y DNI. Contacta con administración.',
-            ])->onlyInput('email', 'dni');
+        if (!$student || !$activation->isValid($student, $validated['token'])) {
+            return back()->withErrors(['email' => self::INVALID_LINK_MESSAGE]);
         }
 
-        if ($user->is_registered) {
-            return back()->withErrors([
-                'email' => 'Esta cuenta ya está activada. Inicia sesión.',
-            ])->onlyInput('email', 'dni');
-        }
+        $activation->activate($student, $validated['password']);
 
-        // Hashed with the configured driver (argon2id, see config/hashing.php)
-        $user->forceFill([
-            'password' => Hash::make($validated['password']),
-            'is_registered' => true,
-        ])->save();
-
-        Auth::login($user);
+        Auth::login($student);
         $request->session()->regenerate();
 
         return redirect()->route('courses.index')

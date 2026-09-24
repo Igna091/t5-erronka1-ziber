@@ -8,6 +8,7 @@ use App\Models\Grade;
 use App\Models\Role;
 use App\Models\Subject;
 use App\Models\User;
+use App\Services\AccountActivation;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use RuntimeException;
@@ -241,6 +242,12 @@ class DatabaseSeeder extends Seeder
                     'grade' => fake()->randomFloat(2, 3, 10),
                 ]);
             }
+        }
+
+        // Pending students have fake emails, so print their activation links instead of emailing them
+        $activation = app(AccountActivation::class);
+        foreach ([$student3, $student4] as $pending) {
+            $this->command?->info("Enlace de activación de {$pending->email}: ".$activation->createLink($pending));
         }
     }
 }

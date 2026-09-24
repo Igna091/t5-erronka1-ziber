@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\AccountActivation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class StudentController extends Controller
 {
@@ -61,11 +63,11 @@ class StudentController extends Controller
     /**
      * Store a newly created student.
      */
-    public function store(Request $request)
+    public function store(Request $request, AccountActivation $activation)
     {
         $validated = $this->validateStudent($request);
 
-        // The student sets their own password when activating the account in /register.
+        // The student sets their own password with the activation link sent by email.
         // Until then, a random unknown password (hashed with argon2id) blocks the login.
         $student = User::create([
             ...$validated,
@@ -74,8 +76,45 @@ class StudentController extends Controller
             'is_registered' => false,
         ]);
 
-        return redirect()->route('admin.students.show', $student)
-            ->with('success', 'Alumno creado. Ya puede activar su cuenta en el registro con su email y DNI.');
+        $redirect = redirect()->route('admin.students.show', $student);
+
+        try {
+            $activation->send($student);
+        } catch (TransportExceptionInterface $e) {
+            report($e);
+
+            return $redirect
+                ->with('success', 'Alumno creado.')
+                ->with('error', 'No se pudo enviar el email de activación. Revisa la configuración del correo y usa «Reenviar email de activación».');
+        }
+
+        return $redirect->with('success', "Alumno creado. Le hemos enviado un email a {$student->email} para activar su cuenta.");
+    }
+
+    /**
+     * Send a new activation email to a student who hasn't activated the account.
+     */
+    public function resendActivation(User $student, AccountActivation $activation)
+    {
+        if (!$student->isStudent()) {
+            abort(404);
+        }
+
+        if ($student->is_registered) {
+            return back()->with('error', 'Este alumno/a ya ha activado su cuenta.');
+        }
+
+        try {
+            if (!$activation->send($student)) {
+                return back()->with('error', 'Ya se ha enviado un email hace menos de un minuto. Espera un poco antes de reenviarlo.');
+            }
+        } catch (TransportExceptionInterface $e) {
+            report($e);
+
+            return back()->with('error', 'No se pudo enviar el email de activación. Revisa la configuración del correo.');
+        }
+
+        return back()->with('success', "Email de activación reenviado a {$student->email}. El enlace anterior ya no funciona.");
     }
 
     /**
@@ -107,7 +146,7 @@ class StudentController extends Controller
     /**
      * Update the specified student.
      */
-    public function update(Request $request, User $student)
+    public function update(Request $request, User $student, AccountActivation $activation)
     {
         if (!$student->isStudent()) {
             abort(404);
@@ -115,8 +154,23 @@ class StudentController extends Controller
 
         $student->update($this->validateStudent($request, $student));
 
-        return redirect()->route('admin.students.show', $student)
+        $redirect = redirect()->route('admin.students.show', $student)
             ->with('success', 'Datos del alumno/a actualizados correctamente.');
+
+        // Pending student with a corrected email: the old link went to the wrong address
+        if (!$student->is_registered && $student->wasChanged('email')) {
+            try {
+                $activation->send($student);
+            } catch (TransportExceptionInterface $e) {
+                report($e);
+
+                return $redirect->with('error', 'No se pudo enviar el email de activación al nuevo email. Usa «Reenviar email de activación».');
+            }
+
+            return $redirect->with('success', "Datos actualizados. Hemos enviado un nuevo email de activación a {$student->email}.");
+        }
+
+        return $redirect;
     }
 
     /**
