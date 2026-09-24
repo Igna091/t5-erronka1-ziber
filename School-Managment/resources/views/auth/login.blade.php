@@ -1,14 +1,17 @@
 @extends('layouts.public')
 
-@section('title', 'Iniciar sesión - EduCenter')
+@section('title', 'Iniciar sesión - ZiberEibar')
 
 @section('content')
 <div class="auth-page">
     <div class="auth-card">
         <div class="auth-header">
-            <div class="auth-logo">E</div>
+            <a href="{{ route('home') }}" class="auth-brand" title="ZiberEibar">
+                <img src="{{ asset('images/logo-claro.png') }}" alt="ZiberEibar Logo" class="auth-logo auth-logo-light">
+                <img src="{{ asset('images/logo-oscuro.png') }}" alt="ZiberEibar Logo" class="auth-logo auth-logo-dark">
+            </a>
             <h1>Iniciar sesión</h1>
-            <p>Accede a tu cuenta de EduCenter</p>
+            <p>Accede a tu cuenta de ZiberEibar</p>
         </div>
 
         @if($errors->any())

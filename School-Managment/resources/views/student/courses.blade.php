@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Cursos - EduCenter')
+@section('title', 'Cursos - ZiberEibar')
 
 @section('content')
 <div class="student-page">

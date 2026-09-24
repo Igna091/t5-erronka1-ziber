@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Mis matrículas - EduCenter')
+@section('title', 'Mis matrículas - ZiberEibar')
 
 @section('content')
 <div class="student-page">

@@ -1,12 +1,12 @@
 @extends('layouts.public')
 
-@section('title', 'Información - EduCenter')
+@section('title', 'Información - ZiberEibar')
 
 @section('content')
 <section class="section">
     <div class="info-section">
-        <h2>Sobre EduCenter</h2>
-        <p>EduCenter es un centro de formación profesional comprometido con la excelencia educativa. Desde nuestra fundación, nos hemos dedicado a ofrecer programas formativos de alta calidad que preparan a nuestros alumnos para enfrentar los retos del mercado laboral actual.</p>
+        <h2>Sobre ZiberEibar</h2>
+        <p>ZiberEibar es un centro de formación profesional comprometido con la excelencia educativa. Desde nuestra fundación, nos hemos dedicado a ofrecer programas formativos de alta calidad que preparan a nuestros alumnos para enfrentar los retos del mercado laboral actual.</p>
         <p>Contamos con un equipo docente altamente cualificado y unas instalaciones modernas que facilitan un aprendizaje práctico y efectivo.</p>
 
         <div class="info-grid">
@@ -38,7 +38,7 @@
 
         <h2>Contacto</h2>
         <p>¿Tienes alguna pregunta? No dudes en contactarnos:</p>
-        <p><strong>Email:</strong> info@educenter.es<br>
+        <p><strong>Email:</strong> info@zibereibar.eus<br>
            <strong>Teléfono:</strong> 900 000 000<br>
            <strong>Dirección:</strong> Calle Educación, 1</p>
     </div>

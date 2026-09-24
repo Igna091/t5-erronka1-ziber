@@ -20,7 +20,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
         <input type="text" name="search" class="form-input" placeholder="Buscar por nombre, email o DNI..." value="{{ request('search') }}">
     </div>
-    <select name="status" class="form-select" style="max-width:200px;" data-auto-submit>
+    <select name="status" class="form-select" data-auto-submit aria-label="Filtrar por estado">
         <option value="">Todos los estados</option>
         <option value="registered" {{ request('status') === 'registered' ? 'selected' : '' }}>Registrados</option>
         <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pendientes</option>

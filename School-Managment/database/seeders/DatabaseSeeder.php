@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
         // Create administrator
         $admin = User::create([
             'name' => 'Admin',
-            'surname' => 'EduCenter',
+            'surname' => 'ZiberEibar',
             'email' => 'admin@educenter.es',
             'password' => 'password',
             'role_id' => $roles[Role::ADMIN],

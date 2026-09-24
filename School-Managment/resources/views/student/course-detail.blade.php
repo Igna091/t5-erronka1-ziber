@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', $course->name . ' - EduCenter')
+@section('title', $course->name . ' - ZiberEibar')
 
 @section('content')
 <div class="student-page">

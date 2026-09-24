@@ -1,13 +1,13 @@
 @extends('layouts.public')
 
-@section('title', 'EduCenter - Centro de Formación Profesional')
+@section('title', 'ZiberEibar - Centro de Formación Profesional')
 
 @section('content')
 {{-- Hero Section --}}
 <section class="hero">
     <div class="hero-content">
         <h1>Formación que impulsa tu futuro</h1>
-        <p>En EduCenter ofrecemos cursos profesionales de alta calidad diseñados para prepararte para el mundo laboral. Descubre tu potencial con nosotros.</p>
+        <p>En ZiberEibar ofrecemos cursos profesionales de alta calidad diseñados para prepararte para el mundo laboral. Descubre tu potencial con nosotros.</p>
         <div class="hero-buttons">
             <a href="{{ route('courses.index') }}" class="btn btn-lg" style="background:white;color:var(--primary);border-color:white;">Ver cursos</a>
             <a href="{{ route('about') }}" class="btn btn-outline-light btn-lg">Conoce nuestro centro</a>

@@ -1,14 +1,17 @@
 @extends('layouts.public')
 
-@section('title', 'Registrarse - EduCenter')
+@section('title', 'Registrarse - ZiberEibar')
 
 @section('content')
 <div class="auth-page">
     <div class="auth-card">
         <div class="auth-header">
-            <div class="auth-logo">E</div>
+            <a href="{{ route('home') }}" class="auth-brand" title="ZiberEibar">
+                <img src="{{ asset('images/logo-claro.png') }}" alt="ZiberEibar Logo" class="auth-logo auth-logo-light">
+                <img src="{{ asset('images/logo-oscuro.png') }}" alt="ZiberEibar Logo" class="auth-logo auth-logo-dark">
+            </a>
             <h1>Registrarse</h1>
-            <p>Activa tu cuenta de alumno</p>
+            <p>Activa tu cuenta de alumno en ZiberEibar</p>
         </div>
 
         <div class="alert alert-info" style="margin-bottom:1.5rem;">
