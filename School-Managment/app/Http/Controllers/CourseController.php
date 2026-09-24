@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\EnrollmentException;
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Services\EnrollmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class CourseController extends Controller
 {
@@ -48,51 +49,12 @@ class CourseController extends Controller
     /**
      * Enroll a student in a course.
      */
-    public function enroll(Request $request, Course $course)
+    public function enroll(Request $request, Course $course, EnrollmentService $enrollments)
     {
-        $studentId = Auth::id();
-
-        $error = DB::transaction(function () use ($course, $studentId) {
-            // Lock the course row so two students can't take the last spot at once
-            $course = Course::whereKey($course->id)->lockForUpdate()->first();
-
-            if (!$course->isActive()) {
-                return 'Este curso no está disponible para matrícula.';
-            }
-
-            if ($course->end_date && $course->end_date->lt(today())) {
-                return 'Este curso ya ha finalizado.';
-            }
-
-            $enrollment = Enrollment::where('student_id', $studentId)
-                ->where('course_id', $course->id)
-                ->first();
-
-            if ($enrollment?->status === 'active') {
-                return 'Ya estás matriculado/a en este curso.';
-            }
-
-            if (!$course->hasAvailableSpots()) {
-                return 'No quedan plazas disponibles en este curso.';
-            }
-
-            // A cancelled enrollment is reactivated (student + course is unique)
-            if ($enrollment) {
-                $enrollment->update(['status' => 'active', 'enrolled_at' => now()]);
-            } else {
-                Enrollment::create([
-                    'student_id' => $studentId,
-                    'course_id' => $course->id,
-                    'enrolled_at' => now(),
-                    'status' => 'active',
-                ]);
-            }
-
-            return null;
-        });
-
-        if ($error) {
-            return back()->with('error', $error);
+        try {
+            $enrollments->enroll(Auth::user(), $course);
+        } catch (EnrollmentException $e) {
+            return back()->with('error', $e->getMessage());
         }
 
         return redirect()->route('student.enrollments')

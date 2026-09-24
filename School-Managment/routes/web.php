@@ -88,6 +88,8 @@ Route::middleware(['auth', 'admin'])->prefix('administracion')->name('admin.')->
 
     // Enrollments
     Route::get('/matriculas', [EnrollmentController::class, 'index'])->name('enrollments.index');
+    Route::get('/matriculas/crear', [EnrollmentController::class, 'create'])->name('enrollments.create');
+    Route::post('/matriculas', [EnrollmentController::class, 'store'])->name('enrollments.store');
     Route::patch('/matriculas/{enrollment}/cancelar', [EnrollmentController::class, 'cancel'])->name('enrollments.cancel');
     Route::patch('/matriculas/{enrollment}/reactivar', [EnrollmentController::class, 'reactivate'])->name('enrollments.reactivate');
 });

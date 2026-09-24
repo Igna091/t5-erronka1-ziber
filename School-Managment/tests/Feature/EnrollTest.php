@@ -68,7 +68,7 @@ class EnrollTest extends TestCase
         $course = $this->course();
 
         $this->enroll($student, $course);
-        $this->enroll($student, $course)->assertSessionHas('error', 'Ya estás matriculado/a en este curso.');
+        $this->enroll($student, $course)->assertSessionHas('error', 'Ya existe una matrícula activa en este curso.');
 
         $this->assertSame(1, Enrollment::count());
     }
