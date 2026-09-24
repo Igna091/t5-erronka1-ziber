@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class StudentController extends Controller
@@ -125,7 +126,21 @@ class StudentController extends Controller
      */
     public function destroy(User $student)
     {
+        if (!$student->isStudent()) {
+            abort(404);
+        }
+
+        $name = $student->full_name;
+
+        DB::transaction(function () use ($student) {
+            // Log the student out of any open session
+            DB::table('sessions')->where('user_id', $student->id)->delete();
+
+            // Enrollments (and their grades) are removed by the cascading foreign keys
+            $student->delete();
+        });
+
         return redirect()->route('admin.students.index')
-            ->with('success', 'Función de eliminación deshabilitada (Modo solo diseño).');
+            ->with('success', "Alumno/a {$name} eliminado/a correctamente.");
     }
 }
