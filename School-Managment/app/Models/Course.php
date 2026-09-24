@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Course extends Model
@@ -19,6 +20,7 @@ class Course extends Model
         'name',
         'code',
         'description',
+        'academic_year',
         'duration_hours',
         'capacity',
         'status',
@@ -55,6 +57,25 @@ class Course extends Model
     public function enrollments(): HasMany
     {
         return $this->hasMany(Enrollment::class);
+    }
+
+    /**
+     * Get the subjects taught in this course.
+     */
+    public function subjects(): BelongsToMany
+    {
+        return $this->belongsToMany(Subject::class)
+            ->using(CourseSubject::class)
+            ->withPivot(['id', 'teacher_id'])
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the course subject rows (subject + teacher) of this course.
+     */
+    public function courseSubjects(): HasMany
+    {
+        return $this->hasMany(CourseSubject::class);
     }
 
     /**

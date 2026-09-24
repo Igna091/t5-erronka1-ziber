@@ -16,14 +16,14 @@ class DashboardController extends Controller
     public function index()
     {
         $stats = [
-            'total_students' => User::where('role', 'student')->count(),
-            'registered_students' => User::where('role', 'student')->where('is_registered', true)->count(),
+            'total_students' => User::students()->count(),
+            'registered_students' => User::students()->where('is_registered', true)->count(),
             'total_courses' => Course::count(),
             'active_courses' => Course::where('status', 'active')->count(),
             'total_enrollments' => Enrollment::where('status', 'active')->count(),
         ];
 
-        $recentStudents = User::where('role', 'student')
+        $recentStudents = User::students()
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();

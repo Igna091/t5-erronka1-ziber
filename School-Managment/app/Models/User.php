@@ -4,7 +4,9 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -24,7 +26,7 @@ class User extends Authenticatable
         'surname',
         'email',
         'password',
-        'role',
+        'role_id',
         'dni',
         'phone',
         'is_registered',
@@ -55,11 +57,46 @@ class User extends Authenticatable
     }
 
     /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        // New users are students unless a role is given
+        static::creating(function (User $user) {
+            $user->role_id ??= Role::where('name', Role::STUDENT)->value('id');
+        });
+    }
+
+    /**
+     * Get the role of the user.
+     */
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * Check if the user has the given role.
+     */
+    public function hasRole(string $role): bool
+    {
+        return $this->role?->name === $role;
+    }
+
+    /**
      * Check if the user is an administrator.
      */
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->hasRole(Role::ADMIN);
+    }
+
+    /**
+     * Check if the user is a teacher.
+     */
+    public function isTeacher(): bool
+    {
+        return $this->hasRole(Role::TEACHER);
     }
 
     /**
@@ -67,7 +104,31 @@ class User extends Authenticatable
      */
     public function isStudent(): bool
     {
-        return $this->role === 'student';
+        return $this->hasRole(Role::STUDENT);
+    }
+
+    /**
+     * Scope a query to users with the given role.
+     */
+    public function scopeWithRole(Builder $query, string $role): void
+    {
+        $query->whereHas('role', fn (Builder $q) => $q->where('name', $role));
+    }
+
+    /**
+     * Scope a query to only students.
+     */
+    public function scopeStudents(Builder $query): void
+    {
+        $query->withRole(Role::STUDENT);
+    }
+
+    /**
+     * Scope a query to only teachers.
+     */
+    public function scopeTeachers(Builder $query): void
+    {
+        $query->withRole(Role::TEACHER);
     }
 
     /**
@@ -94,5 +155,13 @@ class User extends Authenticatable
     public function enrollments(): HasMany
     {
         return $this->hasMany(Enrollment::class, 'student_id');
+    }
+
+    /**
+     * Get the course subjects this teacher teaches.
+     */
+    public function taughtSubjects(): HasMany
+    {
+        return $this->hasMany(CourseSubject::class, 'teacher_id');
     }
 }
