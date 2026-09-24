@@ -87,7 +87,18 @@ class AdminCourseController extends Controller
      */
     public function destroy(Course $course)
     {
+        $activeEnrollments = $course->enrollments()->where('status', 'active')->count();
+
+        // Deleting would also delete the students' enrollments and grades
+        if ($activeEnrollments > 0) {
+            return redirect()->route('admin.courses.index')
+                ->with('error', "No se puede eliminar «{$course->name}»: tiene {$activeEnrollments} matrícula(s) activa(s). Cancélalas o marca el curso como inactivo.");
+        }
+
+        // Cancelled enrollments, course subjects and grades are removed by the cascading foreign keys
+        $course->delete();
+
         return redirect()->route('admin.courses.index')
-            ->with('success', 'Función de eliminación deshabilitada (Modo solo diseño).');
+            ->with('success', "Curso «{$course->name}» eliminado correctamente.");
     }
 }
