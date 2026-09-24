@@ -60,4 +60,35 @@ class EnrollmentService
             ]);
         });
     }
+
+    /**
+     * Cancel an active enrollment. Grades are kept in case it is reactivated.
+     *
+     * @throws EnrollmentException
+     */
+    public function cancel(Enrollment $enrollment): Enrollment
+    {
+        if ($enrollment->status !== 'active') {
+            throw new EnrollmentException('Esta matrícula ya está cancelada.');
+        }
+
+        $enrollment->update(['status' => 'cancelled']);
+
+        return $enrollment;
+    }
+
+    /**
+     * Reactivate a cancelled enrollment, checking the same rules as a new one
+     * (course active, not finished, spots available).
+     *
+     * @throws EnrollmentException
+     */
+    public function reactivate(Enrollment $enrollment): Enrollment
+    {
+        if ($enrollment->status === 'active') {
+            throw new EnrollmentException('Esta matrícula ya está activa.');
+        }
+
+        return $this->enroll($enrollment->student, $enrollment->course);
+    }
 }

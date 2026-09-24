@@ -96,18 +96,28 @@ class EnrollmentController extends Controller
     /**
      * Cancel an enrollment.
      */
-    public function cancel(Enrollment $enrollment)
+    public function cancel(Enrollment $enrollment, EnrollmentService $enrollments)
     {
-        return redirect()->route('admin.enrollments.index')
-            ->with('success', 'Función deshabilitada (Modo solo diseño).');
+        try {
+            $enrollments->cancel($enrollment);
+        } catch (EnrollmentException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', "Matrícula de {$enrollment->student->full_name} en «{$enrollment->course->name}» cancelada.");
     }
 
     /**
      * Reactivate an enrollment.
      */
-    public function reactivate(Enrollment $enrollment)
+    public function reactivate(Enrollment $enrollment, EnrollmentService $enrollments)
     {
-        return redirect()->route('admin.enrollments.index')
-            ->with('success', 'Función deshabilitada (Modo solo diseño).');
+        try {
+            $enrollments->reactivate($enrollment);
+        } catch (EnrollmentException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', "Matrícula de {$enrollment->student->full_name} en «{$enrollment->course->name}» reactivada.");
     }
 }
