@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
 class AdminCourseController extends Controller
@@ -49,8 +50,10 @@ class AdminCourseController extends Controller
      */
     public function store(Request $request)
     {
-        return redirect()->route('admin.courses.index')
-            ->with('success', 'Función de creación deshabilitada (Modo solo diseño).');
+        $course = Course::create($this->validateCourse($request));
+
+        return redirect()->route('admin.courses.show', $course)
+            ->with('success', "Curso «{$course->name}» creado correctamente.");
     }
 
     /**
@@ -97,10 +100,13 @@ class AdminCourseController extends Controller
         // Capacity can't go below the students already enrolled
         $activeEnrollments = $course?->enrollments()->where('status', 'active')->count() ?? 0;
 
-        return $request->validate([
+        // Academic year comes from the start date; without one, the current value is kept
+        $academicYear = $this->academicYearFor($request->input('start_date')) ?? $course?->academic_year;
+
+        $validated = $request->validate([
             'name' => [
                 'required', 'string', 'max:100',
-                Rule::unique('courses', 'name')->where('academic_year', $course?->academic_year)->ignore($course),
+                Rule::unique('courses', 'name')->where('academic_year', $academicYear)->ignore($course),
             ],
             'code' => ['required', 'string', 'max:20', Rule::unique('courses', 'code')->ignore($course)],
             'description' => ['nullable', 'string', 'max:5000'],
@@ -117,6 +123,23 @@ class AdminCourseController extends Controller
                 : 'La capacidad debe ser al menos 1.',
             'end_date.after_or_equal' => 'La fecha de fin no puede ser anterior a la de inicio.',
         ]);
+
+        return [...$validated, 'academic_year' => $academicYear];
+    }
+
+    /**
+     * Academic year (e.g. "2026-2027") of a start date. The school year starts in September.
+     */
+    private function academicYearFor(?string $startDate): ?string
+    {
+        if (!$startDate || strtotime($startDate) === false) {
+            return null;
+        }
+
+        $date = Carbon::parse($startDate);
+        $year = $date->month >= 9 ? $date->year : $date->year - 1;
+
+        return $year.'-'.($year + 1);
     }
 
     /**

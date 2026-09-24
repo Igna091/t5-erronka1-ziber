@@ -114,6 +114,16 @@ class AdminUpdateCourseTest extends TestCase
         $this->updateCourse(['name' => 'Redes'])->assertSessionHasNoErrors();
     }
 
+    public function test_academic_year_follows_start_date(): void
+    {
+        $this->updateCourse(['start_date' => '2027-09-15', 'end_date' => ''])->assertSessionHasNoErrors();
+        $this->assertSame('2027-2028', $this->course->refresh()->academic_year);
+
+        // Without a start date the academic year is kept
+        $this->updateCourse(['start_date' => '', 'end_date' => ''])->assertSessionHasNoErrors();
+        $this->assertSame('2027-2028', $this->course->refresh()->academic_year);
+    }
+
     public function test_end_date_cannot_be_before_start_date(): void
     {
         $this->updateCourse(['start_date' => '2027-01-01', 'end_date' => '2026-12-31'])
