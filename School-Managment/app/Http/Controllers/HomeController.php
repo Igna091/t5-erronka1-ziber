@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -13,16 +13,17 @@ class HomeController extends Controller
     public function index()
     {
         $courses = Course::where('status', 'active')
-            ->with(['enrollments' => function ($query) {
-                $query->where('status', 'active');
-            }])
             ->withCount(['enrollments' => function ($query) {
                 $query->where('status', 'active');
             }])
+            ->orderBy('start_date')
             ->orderBy('name')
             ->get();
 
-        return view('home.index', compact('courses'));
+        $enrolledIds = Auth::user()?->isStudent() ? Auth::user()->activeCourseIds() : [];
+        $academicYear = $courses->pluck('academic_year_label')->filter()->first();
+
+        return view('home.index', compact('courses', 'enrolledIds', 'academicYear'));
     }
 
     /**

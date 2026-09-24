@@ -120,15 +120,22 @@ class StudentController extends Controller
     /**
      * Display the specified student.
      */
-    public function show(User $student)
+    public function show(User $student, AccountActivation $activation)
     {
         if (!$student->isStudent()) {
             abort(404);
         }
 
-        $student->load(['enrollments.course']);
+        $student->load(['enrollments' => fn ($q) => $q->latest('enrolled_at'), 'enrollments.course']);
 
-        return view('admin.students.show', compact('student'));
+        // Activation status for pending students (last email, expiry, resend cooldown)
+        $activationInfo = $student->is_registered ? null : [
+            'sentAt' => $activation->lastSentAt($student),
+            'expiresAt' => $activation->expiresAt($student),
+            'cooldown' => $activation->secondsUntilResend($student),
+        ];
+
+        return view('admin.students.show', compact('student', 'activationInfo'));
     }
 
     /**

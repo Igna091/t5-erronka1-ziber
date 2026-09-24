@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Course extends Model
 {
@@ -87,7 +88,55 @@ class Course extends Model
             return null;
         }
 
-        return max(0, $this->capacity - $this->enrollments()->where('status', 'active')->count());
+        return max(0, $this->capacity - $this->activeEnrollmentsCount());
+    }
+
+    /**
+     * Number of active enrollments. Lists load it with
+     * withCount(['enrollments' => fn ($q) => $q->where('status', 'active')])
+     * so this doesn't run one query per course.
+     */
+    public function activeEnrollmentsCount(): int
+    {
+        if (array_key_exists('enrollments_count', $this->attributes)) {
+            return (int) $this->attributes['enrollments_count'];
+        }
+
+        return $this->enrollments()->where('status', 'active')->count();
+    }
+
+    /**
+     * Free spots as a text meter, e.g. "#########-" (all "#" when there is no limit).
+     */
+    public function seatMeter(int $width = 10): string
+    {
+        if (!$this->capacity) {
+            return str_repeat('#', $width);
+        }
+
+        $lit = (int) round($this->available_spots / $this->capacity * $width);
+
+        return str_repeat('#', $lit).str_repeat('-', $width - $lit);
+    }
+
+    /**
+     * Short name for display, e.g. "diseno-ux-ui".
+     */
+    public function getSlugAttribute(): string
+    {
+        return Str::slug(str_replace('/', ' ', $this->name));
+    }
+
+    /**
+     * Academic year for display, e.g. "2026/27".
+     */
+    public function getAcademicYearLabelAttribute(): ?string
+    {
+        if (!$this->academic_year || !preg_match('/^(\d{4})-\d{2}(\d{2})$/', $this->academic_year, $m)) {
+            return $this->academic_year;
+        }
+
+        return $m[1].'/'.$m[2];
     }
 
     /**

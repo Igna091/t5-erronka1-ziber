@@ -1,56 +1,29 @@
 @extends('layouts.admin')
 
-@section('title', 'Editar alumno')
-@section('header', 'Editar alumno')
+@section('title', 'Editar '.$student->full_name)
+@section('path', 'alumnos/'.$student->id.'/editar')
 
 @section('content')
+<a href="{{ route('admin.students.show', $student) }}" class="back-link"><x-icon name="arrow-left" :size="16" />volver a la ficha</a>
+
 <div class="page-header">
-    <h1>Editar alumno</h1>
-</div>
-
-<div class="card" style="max-width:700px;">
-    <div class="card-body" style="padding:2rem;">
-        <form method="POST" action="{{ route('admin.students.update', $student) }}">
-            @csrf
-            @method('PUT')
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="name" class="form-label">Nombre *</label>
-                    <input type="text" id="name" name="name" class="form-input" value="{{ old('name', $student->name) }}" required>
-                    @error('name')<span class="form-error">{{ $message }}</span>@enderror
-                </div>
-                <div class="form-group">
-                    <label for="surname" class="form-label">Apellidos *</label>
-                    <input type="text" id="surname" name="surname" class="form-input" value="{{ old('surname', $student->surname) }}" required>
-                    @error('surname')<span class="form-error">{{ $message }}</span>@enderror
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="email" class="form-label">Email *</label>
-                    <input type="email" id="email" name="email" class="form-input" value="{{ old('email', $student->email) }}" required>
-                    @error('email')<span class="form-error">{{ $message }}</span>@enderror
-                </div>
-                <div class="form-group">
-                    <label for="dni" class="form-label">DNI / NIE *</label>
-                    <input type="text" id="dni" name="dni" class="form-input" value="{{ old('dni', $student->dni) }}" required>
-                    @error('dni')<span class="form-error">{{ $message }}</span>@enderror
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="phone" class="form-label">Teléfono</label>
-                <input type="text" id="phone" name="phone" class="form-input" value="{{ old('phone', $student->phone) }}">
-                @error('phone')<span class="form-error">{{ $message }}</span>@enderror
-            </div>
-
-            <div style="display:flex;gap:0.75rem;">
-                <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                <a href="{{ route('admin.students.index') }}" class="btn btn-ghost">Cancelar</a>
-            </div>
-        </form>
+    <div class="page-header__title">
+        <h1 class="h-admin"><span class="fx-type">Editar alumno.</span></h1>
+        <span class="text-2">{{ $student->full_name }}@unless ($student->is_registered) · si cambias el email de un alumno pendiente, le enviaremos un enlace nuevo @endunless</span>
     </div>
 </div>
+
+<form method="POST" action="{{ route('admin.students.update', $student) }}" class="panel form-card fx-fade" style="--d: 0.2s" novalidate>
+    @csrf
+    @method('PUT')
+    <div class="panel__head"><h2 class="lbl">datos del alumno</h2><span class="xs muted">* obligatorio</span></div>
+    <div class="panel__body form">
+        @include('admin.partials.student-fields')
+        <div class="hr"></div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            <a href="{{ route('admin.students.show', $student) }}" class="btn btn-ghost">cancelar</a>
+        </div>
+    </div>
+</form>
 @endsection

@@ -3,44 +3,81 @@
 @section('title', 'Información - ZiberEibar')
 
 @section('content')
-<section class="section">
-    <div class="info-section">
-        <h2>Sobre ZiberEibar</h2>
-        <p>ZiberEibar es un centro de formación profesional comprometido con la excelencia educativa. Desde nuestra fundación, nos hemos dedicado a ofrecer programas formativos de alta calidad que preparan a nuestros alumnos para enfrentar los retos del mercado laboral actual.</p>
-        <p>Contamos con un equipo docente altamente cualificado y unas instalaciones modernas que facilitan un aprendizaje práctico y efectivo.</p>
+<section class="container page-top">
+    <div class="section-head">
+        <div class="section-head__title">
+            <span class="kicker fx-fade">~/información</span>
+            <h1 class="h-page"><span class="fx-type">Sobre</span><span class="fx-type acc" style="--d: 0.6s">ZiberEibar.<span class="cursor" aria-hidden="true"></span></span></h1>
+        </div>
+        <div class="stack fx-fade" style="--d: 1s; max-width: 34rem;">
+            <p class="lead">ZiberEibar es un centro de formación profesional comprometido con la excelencia educativa. Nos dedicamos a ofrecer programas formativos de alta calidad que preparan a nuestros alumnos para el mundo laboral.</p>
+            <p class="lead">Contamos con un equipo docente altamente cualificado y unas instalaciones modernas que facilitan un aprendizaje práctico y efectivo.</p>
+        </div>
+    </div>
 
-        <div class="info-grid">
-            <div class="info-card">
-                <div class="info-card-icon" style="background:rgba(30,58,138,0.1);color:var(--primary);">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a23.838 23.838 0 0 0-1.012 5.434c0 .043.016.086.044.124a23.77 23.77 0 0 0 4.454-1.601M4.26 10.147A23.96 23.96 0 0 1 12 8.443a23.96 23.96 0 0 1 7.74 1.704M4.26 10.147 12 6l7.74 4.147M12 6V3"/></svg>
-                </div>
-                <h4>Formación de calidad</h4>
-                <p>Programas actualizados y orientados al mercado laboral con metodología práctica.</p>
-            </div>
-            <div class="info-card">
-                <div class="info-card-icon" style="background:rgba(5,150,105,0.1);color:var(--tertiary);">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>
-                </div>
-                <h4>Profesorado experto</h4>
-                <p>Docentes con amplia experiencia profesional y vocación educativa.</p>
-            </div>
-            <div class="info-card">
-                <div class="info-card-icon" style="background:rgba(37,99,235,0.1);color:var(--secondary);">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/></svg>
-                </div>
-                <h4>Instalaciones modernas</h4>
-                <p>Espacios equipados con la última tecnología para un aprendizaje óptimo.</p>
+    <div class="values">
+        <article class="panel value fx-fade" style="--d: 1.1s">
+            <span class="value__n">01</span>
+            <h2>Formación de calidad</h2>
+            <p>Programas actualizados y orientados al mercado laboral con metodología práctica.</p>
+        </article>
+        <article class="panel value fx-fade" style="--d: 1.2s">
+            <span class="value__n">02</span>
+            <h2>Profesorado experto</h2>
+            <p>Docentes con amplia experiencia profesional y vocación educativa.</p>
+        </article>
+        <article class="panel value fx-fade" style="--d: 1.3s">
+            <span class="value__n">03</span>
+            <h2>Instalaciones modernas</h2>
+            <p>Espacios equipados con la última tecnología para un aprendizaje óptimo.</p>
+        </article>
+    </div>
+</section>
+
+<section class="container section" id="matricula">
+    <div class="section-head">
+        <div class="section-head__title">
+            <span class="kicker">// matrícula</span>
+            <h2 class="h-section">Cómo matricularse.</h2>
+        </div>
+        <p>La matrícula es online. Solo necesitas tu cuenta de alumno.</p>
+    </div>
+
+    <div class="grid-2">
+        <div class="terminal">
+            <div class="terminal__bar"><span>zibereibar@eibar: ~/ayuda</span><span>tty1</span></div>
+            <ol class="terminal__body steps" style="font-size: 0.9375rem; gap: 1rem;">
+                <li class="is-done">El centro te da de alta con tu email.</li>
+                <li class="is-done">Recibes un email con el enlace de activación (caduca en 7 días).</li>
+                <li class="is-now">Abres el enlace y eliges tu contraseña.</li>
+                <li>Inicias sesión y pulsas «Matricularme» en la ficha del curso.</li>
+            </ol>
+        </div>
+        <div class="panel panel__pad">
+            <x-pads :count="2" />
+            <span class="lbl">¿no te llegó el email?</span>
+            <p class="text-2" style="line-height: 1.7;">Revisa la carpeta de spam. Si el enlace ha caducado o lo has perdido, puedes pedir uno nuevo; el anterior dejará de funcionar.</p>
+            <div class="form-actions">
+                <a href="{{ route('register') }}" class="btn btn-outline btn-bracket">reenviar enlace</a>
+                <a href="{{ route('courses.index') }}" class="link-arrow">ver cursos</a>
             </div>
         </div>
+    </div>
+</section>
 
-        <h2>Nuestra misión</h2>
+<section class="container section">
+    <div class="section-head">
+        <div class="section-head__title">
+            <span class="kicker">// misión</span>
+            <h2 class="h-section">Nuestra misión.</h2>
+        </div>
         <p>Formar profesionales competentes y comprometidos, capaces de adaptarse a un entorno laboral en constante evolución, mediante una educación de calidad, innovadora y accesible.</p>
+    </div>
 
-        <h2>Contacto</h2>
-        <p>¿Tienes alguna pregunta? No dudes en contactarnos:</p>
-        <p><strong>Email:</strong> info@zibereibar.eus<br>
-           <strong>Teléfono:</strong> 900 000 000<br>
-           <strong>Dirección:</strong> Calle Educación, 1</p>
+    <div class="panel contact-grid">
+        <div class="spec"><span class="lbl">email</span><a class="spec__value" href="mailto:info@zibereibar.eus" style="font-size: 1.375rem;">info@zibereibar.eus</a></div>
+        <div class="spec"><span class="lbl">teléfono</span><a class="spec__value" href="tel:+34900000000" style="font-size: 1.375rem; color: var(--text);">900 000 000</a></div>
+        <div class="spec"><span class="lbl">dirección</span><span class="spec__value" style="font-size: 1.375rem;">Calle Educación, 1</span></div>
     </div>
 </section>
 @endsection

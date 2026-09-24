@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // ==========================================
     const themeToggles = document.querySelectorAll('.theme-toggle');
     const themeChoiceCards = document.querySelectorAll('.theme-choice-card');
-    const savedTheme = localStorage.getItem('theme') || 'light';
+    const savedTheme = localStorage.getItem('theme') || 'dark';
     
     function applyTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme);
@@ -311,6 +311,108 @@ document.addEventListener('DOMContentLoaded', function () {
         field.addEventListener('change', function () {
             if (field.form) field.form.submit();
         });
+    });
+
+    // ==========================================
+    // Course browser: pick a course in the list to show its panel
+    // (links still open the course page on small screens or without JS)
+    // ==========================================
+    document.querySelectorAll('[data-browser]').forEach(function (browser) {
+        const rows = browser.querySelectorAll('[data-course-row]');
+        const wide = window.matchMedia('(min-width: 1181px)');
+
+        rows.forEach(function (row) {
+            row.addEventListener('click', function (e) {
+                if (!wide.matches || e.metaKey || e.ctrlKey || e.shiftKey) return;
+                e.preventDefault();
+
+                rows.forEach(function (other) {
+                    const selected = other === row;
+                    other.classList.toggle('is-sel', selected);
+                    other.setAttribute('aria-current', selected ? 'true' : 'false');
+                    const mark = other.querySelector('.ls__mark');
+                    if (mark) mark.textContent = selected ? '>' : '';
+                    const panel = document.getElementById(other.getAttribute('data-target'));
+                    if (panel) panel.hidden = !selected;
+                });
+            });
+        });
+    });
+
+    // ==========================================
+    // Show / hide password
+    // ==========================================
+    document.querySelectorAll('[data-toggle-password]').forEach(function (btn) {
+        const input = document.getElementById(btn.getAttribute('data-toggle-password'));
+        if (!input) return;
+
+        btn.addEventListener('click', function () {
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            btn.textContent = show ? 'ocultar' : 'mostrar';
+            btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+        });
+    });
+
+    // ==========================================
+    // Live password requirements (same rules as the backend)
+    // ==========================================
+    document.querySelectorAll('[data-password-rules]').forEach(function (box) {
+        const form = box.closest('form');
+        const pw = form && form.querySelector('[data-password]');
+        const confirmation = form && form.querySelector('[data-password-confirm]');
+        const submit = form && form.querySelector('[type="submit"]');
+        const meter = box.querySelector('[data-rules-meter]');
+        if (!pw || !confirmation) return;
+
+        const checks = {
+            length: function (v) { return v.length >= 8; },
+            letters: function (v) { return /\p{L}/u.test(v); },
+            numbers: function (v) { return /\d/.test(v); },
+            match: function (v, c) { return v.length > 0 && v === c; }
+        };
+
+        function update() {
+            let passed = 0;
+            const keys = Object.keys(checks);
+            keys.forEach(function (key) {
+                const ok = checks[key](pw.value, confirmation.value);
+                const rule = box.querySelector('[data-rule="' + key + '"]');
+                if (rule) rule.classList.toggle('is-ok', ok);
+                if (ok) passed++;
+            });
+            const lit = Math.round((passed / keys.length) * 10);
+            if (meter) meter.textContent = '[' + '#'.repeat(lit) + '-'.repeat(10 - lit) + ']';
+            if (submit) submit.disabled = passed !== keys.length;
+        }
+
+        pw.addEventListener('input', update);
+        confirmation.addEventListener('input', update);
+        update();
+    });
+
+    // ==========================================
+    // Countdown on buttons that are rate limited (data-countdown="seconds")
+    // ==========================================
+    document.querySelectorAll('[data-countdown]').forEach(function (btn) {
+        let left = parseInt(btn.getAttribute('data-countdown'), 10);
+        if (!(left > 0)) return;
+
+        const label = btn.textContent;
+        btn.disabled = true;
+
+        function tick() {
+            if (left <= 0) {
+                btn.disabled = false;
+                btn.textContent = label;
+                return;
+            }
+            btn.textContent = 'Espera ' + left + ' s';
+            left--;
+            setTimeout(tick, 1000);
+        }
+
+        tick();
     });
 
     // ==========================================

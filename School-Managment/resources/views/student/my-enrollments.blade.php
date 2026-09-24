@@ -3,54 +3,95 @@
 @section('title', 'Mis matrículas - ZiberEibar')
 
 @section('content')
-<div class="student-page">
-    <div class="student-page-header">
-        <h1>Mis matrículas</h1>
-        <p>Cursos en los que estás matriculado.</p>
+@php
+    $user = auth()->user();
+    $active = $enrollments->where('status', 'active');
+@endphp
+
+<section class="container page-top area">
+    <div class="area__main">
+        <div class="area__head">
+            <div class="stack-sm">
+                <span class="kicker fx-fade">alumno // {{ mb_strtolower($user->full_name) }}</span>
+                <h1 class="h-page"><span class="fx-type">Mis matrículas.</span></h1>
+            </div>
+            <span class="text-2" style="display: inline-flex; align-items: center; gap: 0.625rem; padding-bottom: 0.5rem;">
+                <span class="led" aria-hidden="true"></span>{{ $active->count() }} {{ $active->count() === 1 ? 'activa' : 'activas' }}
+            </span>
+        </div>
+
+        @if ($enrollments->isNotEmpty())
+            <div class="stack">
+                @foreach ($enrollments as $enrollment)
+                    @php
+                        $course = $enrollment->course;
+                    @endphp
+                    @if ($enrollment->status === 'active')
+                        <a href="{{ route('courses.show', $course) }}" class="enrol-card fx-fade" style="--d: {{ number_format(0.2 + $loop->index * 0.1, 2) }}s">
+                            <div class="stack-sm">
+                                <span class="acc">{{ $course->code }}</span>
+                                <span class="status status--ok">activa</span>
+                            </div>
+                            <div class="stack-sm">
+                                <span class="enrol-card__name">{{ $course->name }}</span>
+                                <span class="small muted">
+                                    {{ $course->duration_hours ? $course->duration_hours.' h · ' : '' }}{{ $course->start_date?->format('d.m.Y') ?? '—' }} → {{ $course->end_date?->format('d.m.Y') ?? '—' }}
+                                </span>
+                            </div>
+                            <div class="stack-sm">
+                                <span class="lbl">matriculado/a el</span>
+                                <span>{{ $enrollment->enrolled_at->format('d.m.Y') }}</span>
+                            </div>
+                            <span class="enrol-card__go" aria-hidden="true"><x-icon name="arrow-right" /></span>
+                        </a>
+                    @else
+                        <div class="enrol-card enrol-card--off fx-fade" style="--d: {{ number_format(0.2 + $loop->index * 0.1, 2) }}s">
+                            <div class="stack-sm">
+                                <span>{{ $course->code }}</span>
+                                <span class="status status--off">cancelada</span>
+                            </div>
+                            <div class="stack-sm">
+                                <span class="enrol-card__name">{{ $course->name }}</span>
+                                <span class="small">cancelada por administración</span>
+                            </div>
+                            <div class="stack-sm">
+                                <span class="lbl">matriculado/a el</span>
+                                <span>{{ $enrollment->enrolled_at->format('d.m.Y') }}</span>
+                            </div>
+                            <span></span>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+        @else
+            <div class="panel empty">
+                <span class="empty__cmd">ls matrículas/ <span class="muted">— vacío</span></span>
+                <span>Aún no te has matriculado en ningún curso.</span>
+            </div>
+        @endif
+
+        <a href="{{ route('courses.index') }}" class="btn btn-ghost" style="align-self: flex-start;"><span class="acc">$</span>explorar cursos</a>
     </div>
 
-    @if($enrollments->count() > 0)
-        <div class="table-wrapper">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Curso</th>
-                        <th>Código</th>
-                        <th>Fecha de matrícula</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($enrollments as $enrollment)
-                        <tr>
-                            <td>
-                                <a href="{{ route('courses.show', $enrollment->course) }}" style="font-weight:500;color:var(--text-primary);">
-                                    {{ $enrollment->course->name }}
-                                </a>
-                            </td>
-                            <td><span class="course-card-code">{{ $enrollment->course->code }}</span></td>
-                            <td>{{ $enrollment->enrolled_at->format('d/m/Y H:i') }}</td>
-                            <td>
-                                @if($enrollment->status === 'active')
-                                    <span class="badge badge-success">Activa</span>
-                                @else
-                                    <span class="badge badge-danger">Cancelada</span>
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    @else
-        <div class="card">
-            <div class="empty-state">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15a2.25 2.25 0 0 1 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/></svg>
-                <h3>Sin matrículas</h3>
-                <p>Aún no te has matriculado en ningún curso.</p>
-                <a href="{{ route('courses.index') }}" class="btn btn-primary btn-sm">Ver cursos disponibles</a>
+    <aside class="panel panel__pad fx-fade" style="--d: 0.2s" aria-label="Tu cuenta">
+        <x-pads :count="2" />
+        <span class="lbl">tu cuenta</span>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span class="avatar avatar--md">{{ $user->initials }}</span>
+            <div class="stack-sm" style="gap: 0.25rem;">
+                <span class="disp" style="font-size: 1.5rem; font-weight: 700; line-height: 1.1;">{{ $user->full_name }}</span>
+                <span class="status status--ok">cuenta activada</span>
             </div>
         </div>
-    @endif
-</div>
+        <dl class="dl" style="border-block: 1px solid var(--line);">
+            <div><dt class="lbl">email</dt><dd>{{ $user->email }}</dd></div>
+            <div><dt class="lbl">dni</dt><dd>{{ $user->dni ?? '—' }}</dd></div>
+            <div><dt class="lbl">teléfono</dt><dd>{{ $user->phone ?? '—' }}</dd></div>
+        </dl>
+        <div class="stack-sm" style="gap: 0;">
+            <a href="{{ route('student.profile') }}" class="link-arrow">ver mi perfil</a>
+            <a href="{{ route('settings.index') }}" class="link-arrow">ajustes</a>
+        </div>
+    </aside>
+</section>
 @endsection

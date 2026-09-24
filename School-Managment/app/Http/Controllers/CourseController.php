@@ -20,10 +20,13 @@ class CourseController extends Controller
             ->withCount(['enrollments' => function ($query) {
                 $query->where('status', 'active');
             }])
+            ->orderBy('start_date')
             ->orderBy('name')
             ->get();
 
-        return view('student.courses', compact('courses'));
+        $enrolledIds = Auth::user()?->isStudent() ? Auth::user()->activeCourseIds() : [];
+
+        return view('student.courses', compact('courses', 'enrolledIds'));
     }
 
     /**
@@ -42,6 +45,7 @@ class CourseController extends Controller
         $course->loadCount(['enrollments' => function ($query) {
             $query->where('status', 'active');
         }]);
+        $course->load(['courseSubjects.subject', 'courseSubjects.teacher']);
 
         $isEnrolled = false;
         if (Auth::check() && Auth::user()->isStudent()) {

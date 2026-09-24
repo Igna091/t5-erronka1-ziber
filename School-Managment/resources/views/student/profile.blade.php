@@ -3,48 +3,41 @@
 @section('title', 'Mi perfil - ZiberEibar')
 
 @section('content')
-<div class="student-page">
-    <div class="student-page-header">
-        <h1>Mi perfil</h1>
-    </div>
-
-    <div class="card profile-card">
-        <div class="card-body" style="padding:2rem;">
-            <div class="profile-header">
-                <div class="profile-avatar">{{ $user->initials }}</div>
-                <div class="profile-info">
-                    <h2>{{ $user->full_name }}</h2>
-                    <p>{{ $user->email }}</p>
-                </div>
-            </div>
-
-            <div class="profile-details">
-                <div class="profile-detail-item">
-                    <div class="profile-detail-label">Nombre</div>
-                    <div class="profile-detail-value">{{ $user->name }}</div>
-                </div>
-                <div class="profile-detail-item">
-                    <div class="profile-detail-label">Apellidos</div>
-                    <div class="profile-detail-value">{{ $user->surname ?? '—' }}</div>
-                </div>
-                <div class="profile-detail-item">
-                    <div class="profile-detail-label">Email</div>
-                    <div class="profile-detail-value">{{ $user->email }}</div>
-                </div>
-                <div class="profile-detail-item">
-                    <div class="profile-detail-label">DNI</div>
-                    <div class="profile-detail-value">{{ $user->dni ?? '—' }}</div>
-                </div>
-                <div class="profile-detail-item">
-                    <div class="profile-detail-label">Teléfono</div>
-                    <div class="profile-detail-value">{{ $user->phone ?? '—' }}</div>
-                </div>
-                <div class="profile-detail-item">
-                    <div class="profile-detail-label">Cursos matriculados</div>
-                    <div class="profile-detail-value">{{ $enrollmentCount }}</div>
-                </div>
-            </div>
+<section class="container page-top area">
+    <div class="area__main">
+        <div class="stack-sm">
+            <span class="kicker fx-fade">alumno // perfil</span>
+            <h1 class="h-page"><span class="fx-type">Mi perfil.</span></h1>
         </div>
+
+        <div class="panel fx-fade" style="--d: 0.3s">
+            <div class="panel__head"><h2 class="lbl">datos personales</h2><span class="status status--ok">cuenta activada</span></div>
+            <dl class="dl panel__body" style="gap: 0; padding-block: 0.5rem 1rem;">
+                <div><dt class="lbl">nombre</dt><dd>{{ $user->name }}</dd></div>
+                <div><dt class="lbl">apellidos</dt><dd>{{ $user->surname ?? '—' }}</dd></div>
+                <div><dt class="lbl">email</dt><dd>{{ $user->email }}</dd></div>
+                <div><dt class="lbl">dni</dt><dd>{{ $user->dni ?? '—' }}</dd></div>
+                <div><dt class="lbl">teléfono</dt><dd>{{ $user->phone ?? '—' }}</dd></div>
+            </dl>
+        </div>
+        <p class="small muted">Para cambiar tus datos personales, contacta con administración.</p>
     </div>
-</div>
+
+    <aside class="panel panel__pad fx-fade" style="--d: 0.2s" aria-label="Resumen">
+        <x-pads :count="2" />
+        <span class="lbl">resumen</span>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <span class="avatar avatar--md">{{ $user->initials }}</span>
+            <span class="disp" style="font-size: 1.5rem; font-weight: 700; line-height: 1.1;">{{ $user->full_name }}</span>
+        </div>
+        <div style="display: flex; align-items: baseline; gap: 0.75rem; padding-block: 1rem; border-block: 1px solid var(--line);">
+            <span class="big-number" style="font-size: 4rem;">{{ $enrollmentCount }}</span>
+            <span class="text-2">{{ $enrollmentCount === 1 ? 'curso matriculado' : 'cursos matriculados' }}</span>
+        </div>
+        <div class="stack-sm" style="gap: 0;">
+            <a href="{{ route('student.enrollments') }}" class="link-arrow">mis matrículas</a>
+            <a href="{{ route('courses.index') }}" class="link-arrow">ver cursos</a>
+        </div>
+    </aside>
+</section>
 @endsection

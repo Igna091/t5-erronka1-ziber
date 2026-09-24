@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\User;
 use App\Notifications\ActivateAccount;
 use Illuminate\Auth\Passwords\PasswordBroker;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
@@ -69,6 +71,42 @@ class AccountActivation
         }
 
         return true;
+    }
+
+    /**
+     * When the current activation link was sent (null if there is none).
+     */
+    public function lastSentAt(User $student): ?Carbon
+    {
+        $createdAt = DB::table(config('auth.passwords.activations.table'))
+            ->where('email', $student->email)
+            ->value('created_at');
+
+        return $createdAt ? Carbon::parse($createdAt) : null;
+    }
+
+    /**
+     * When the current activation link stops working (null if there is none).
+     */
+    public function expiresAt(User $student): ?Carbon
+    {
+        return $this->lastSentAt($student)?->addMinutes((int) config('auth.passwords.activations.expire'));
+    }
+
+    /**
+     * Seconds left before another email can be sent (0 = can send now).
+     */
+    public function secondsUntilResend(User $student): int
+    {
+        $sentAt = $this->lastSentAt($student);
+
+        if (!$sentAt) {
+            return 0;
+        }
+
+        $throttle = (int) config('auth.passwords.activations.throttle', 60);
+
+        return max(0, (int) ceil($throttle - $sentAt->diffInSeconds(now(), true)));
     }
 
     /**

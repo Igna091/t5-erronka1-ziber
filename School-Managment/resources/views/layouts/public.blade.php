@@ -1,191 +1,146 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="ZiberEibar - Centro de formación profesional. Cursos de calidad para impulsar tu futuro.">
-    <title>@yield('title', 'ZiberEibar - Centro de Formación')</title>
+    <meta name="description" content="@yield('description', 'ZiberEibar, centro de formación profesional en Eibar: desarrollo web, diseño UX/UI, sistemas, ciberseguridad e inteligencia artificial.')">
+    <title>@yield('title', 'ZiberEibar - Centro de formación profesional')</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-oscuro.png') }}">
+    <script src="{{ asset('js/theme-init.js') }}?v={{ filemtime(public_path('js/theme-init.js')) }}"></script>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}?v={{ filemtime(public_path('css/app.css')) }}">
 </head>
-<body class="public-layout">
-    {{-- Navbar --}}
-    <nav class="navbar">
-        <div class="navbar-inner">
-            <a href="{{ route('home') }}" class="navbar-brand">
-                <img src="{{ asset('images/logo-claro.png') }}" alt="ZiberEibar Logo" class="navbar-logo navbar-logo-light">
-                <img src="{{ asset('images/logo-oscuro.png') }}" alt="ZiberEibar Logo" class="navbar-logo navbar-logo-dark">
-                <span class="navbar-brand-text">ZiberEibar</span>
-            </a>
+<body>
+    <a class="skip-link" href="#mainContent">Saltar al contenido</a>
+    <div class="scanline" aria-hidden="true"></div>
 
-            <button class="navbar-toggle" aria-label="Abrir menú" aria-expanded="false" id="mobileNavToggle">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
-            </button>
+    <div class="site">
+        <header class="topnav">
+            <div class="topnav__inner">
+                <a href="{{ route('home') }}" class="brand" aria-label="ZiberEibar, ir al inicio">
+                    <img src="{{ asset('images/logo-oscuro.png') }}" alt="" class="logo-on-dark">
+                    <img src="{{ asset('images/logo-claro.png') }}" alt="" class="logo-on-light">
+                    <span>ziber_eibar<span class="cursor" aria-hidden="true"></span></span>
+                </a>
 
-            <ul class="navbar-links" id="navbarLinks">
-                <li><a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Inicio</a></li>
-                <li><a href="{{ route('courses.index') }}" class="{{ request()->routeIs('courses.*') ? 'active' : '' }}">Cursos</a></li>
-                <li><a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">Información</a></li>
-
-                @guest
-                    <li class="mobile-only-auth"><a href="{{ route('settings.index') }}">Ajustes</a></li>
-                    <li class="mobile-only-auth"><a href="{{ route('login') }}">Iniciar sesión</a></li>
-                    <li class="mobile-only-auth"><a href="{{ route('register') }}">Registrarse</a></li>
-                @else
-                    @if(auth()->user()->isStudent())
-                        <li><a href="{{ route('student.enrollments') }}" class="{{ request()->routeIs('student.enrollments') ? 'active' : '' }}">Mis matrículas</a></li>
-                    @endif
-                    @if(auth()->user()->isAdmin())
-                        <li><a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.*') ? 'active' : '' }}">Panel de administración</a></li>
-                    @endif
-                @endguest
-            </ul>
-
-            <div class="navbar-actions">
-                <button class="theme-toggle" aria-label="Cambiar tema" title="Cambiar tema">
-                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 8.002-4.248Z"/></svg>
-                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"/></svg>
-                </button>
-
-                @guest
-                    <a href="{{ route('settings.index') }}" class="navbar-icon-btn" title="Ajustes" aria-label="Ajustes">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
-                        </svg>
-                    </a>
-                    <a href="{{ route('login') }}" class="btn btn-ghost btn-sm navbar-auth-btn">Iniciar sesión</a>
-                    <a href="{{ route('register') }}" class="btn btn-primary btn-sm navbar-auth-btn">Registrarse</a>
-                @else
-                    {{-- User Dropdown with Name & Role for All Authenticated Users --}}
-                    <div class="user-dropdown-wrapper">
-                        <button class="user-dropdown-btn admin-user-btn" id="userMenuBtn" aria-expanded="false" aria-haspopup="true">
-                            <span class="user-avatar">{{ auth()->user()->initials ?? 'U' }}</span>
-                            <div class="admin-header-info">
-                                <div class="admin-header-name">{{ auth()->user()->name }}</div>
-                                <div class="admin-header-role">
-                                    @if(auth()->user()->isAdmin())
-                                        Administrador
-                                    @elseif(auth()->user()->isTeacher())
-                                        Profesor
-                                    @else
-                                        Estudiante
-                                    @endif
-                                </div>
-                            </div>
-                            <svg class="dropdown-chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                            </svg>
-                        </button>
-
-                        <div class="user-dropdown-menu" id="userMenuDropdown" role="menu" aria-labelledby="userMenuBtn">
-                            <div class="dropdown-header">
-                                <div class="dropdown-user-name">{{ auth()->user()->full_name }}</div>
-                                <div class="dropdown-user-role">
-                                    @if(auth()->user()->isAdmin())
-                                        Administrador
-                                    @elseif(auth()->user()->isTeacher())
-                                        Profesor
-                                    @else
-                                        Estudiante
-                                    @endif
-                                </div>
-                                <div class="dropdown-user-email">{{ auth()->user()->email }}</div>
-                            </div>
-
-                            <div class="dropdown-divider"></div>
-
-                            @if(auth()->user()->isAdmin())
-                                <a href="{{ route('admin.dashboard') }}" class="dropdown-item" role="menuitem">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
-                                    Panel de administración
-                                </a>
-                            @else
-                                <a href="{{ route('student.profile') }}" class="dropdown-item {{ request()->routeIs('student.profile') ? 'active' : '' }}" role="menuitem">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/></svg>
-                                    Mi perfil
-                                </a>
-                                <a href="{{ route('student.enrollments') }}" class="dropdown-item {{ request()->routeIs('student.enrollments') ? 'active' : '' }}" role="menuitem">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/></svg>
-                                    Mis matrículas
-                                </a>
+                <nav aria-label="Principal">
+                    <div class="navbar-links" id="navbarLinks">
+                        <a href="{{ route('home') }}" @if(request()->routeIs('home')) aria-current="page" @endif>~/inicio</a>
+                        <a href="{{ route('courses.index') }}" @if(request()->routeIs('courses.*')) aria-current="page" @endif>~/cursos</a>
+                        <a href="{{ route('about') }}" @if(request()->routeIs('about')) aria-current="page" @endif>~/información</a>
+                        @auth
+                            @if(auth()->user()->isStudent())
+                                <a href="{{ route('student.enrollments') }}" @if(request()->routeIs('student.enrollments')) aria-current="page" @endif>~/mis-matrículas</a>
                             @endif
-
-                            <a href="{{ route('settings.index') }}" class="dropdown-item {{ request()->routeIs('settings.index') ? 'active' : '' }}" role="menuitem">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                                Ajustes
-                            </a>
-
-                            <div class="dropdown-divider"></div>
-
-                            <form method="POST" action="{{ route('logout') }}" class="dropdown-logout-form">
-                                @csrf
-                                <button type="submit" class="dropdown-item dropdown-logout-btn" role="menuitem">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/></svg>
-                                    Cerrar sesión
-                                </button>
-                            </form>
-                        </div>
+                            @if(auth()->user()->isAdmin())
+                                <a href="{{ route('admin.dashboard') }}">~/admin</a>
+                            @endif
+                        @else
+                            <a href="{{ route('login') }}" class="mobile-only">~/iniciar-sesión</a>
+                            <a href="{{ route('register') }}" class="mobile-only">~/activar-cuenta</a>
+                            <a href="{{ route('settings.index') }}" class="mobile-only">~/ajustes</a>
+                        @endauth
                     </div>
-                @endguest
-            </div>
-        </div>
-    </nav>
+                </nav>
 
-    {{-- Flash Messages --}}
-    @if(session('success'))
-        <div style="max-width:1200px;margin:1rem auto;padding:0 1.5rem;">
-            <div class="alert alert-success" data-auto-hide>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-                {{ session('success') }}
-            </div>
-        </div>
-    @endif
+                <div class="topnav__actions">
+                    <button type="button" class="icon-btn theme-toggle" aria-label="Cambiar entre tema oscuro y claro">
+                        <x-icon name="moon" class="icon-moon" />
+                        <x-icon name="sun" class="icon-sun" />
+                    </button>
 
-    @if(session('error'))
-        <div style="max-width:1200px;margin:1rem auto;padding:0 1.5rem;">
-            <div class="alert alert-error" data-auto-hide>
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
-                {{ session('error') }}
-            </div>
-        </div>
-    @endif
+                    @guest
+                        <a href="{{ route('settings.index') }}" class="icon-btn hide-mobile" aria-label="Ajustes"><x-icon name="settings" /></a>
+                        <a href="{{ route('register') }}" class="link-quiet hide-mobile">activar cuenta</a>
+                        <a href="{{ route('login') }}" class="btn btn-outline btn-bracket btn-sm hide-sm" @if(request()->routeIs('login')) aria-current="page" @endif>iniciar sesión</a>
+                    @else
+                        <div class="user-dropdown-wrapper">
+                            <button type="button" class="user-dropdown-btn" id="userMenuBtn" aria-expanded="false" aria-haspopup="true" aria-controls="userMenuDropdown">
+                                <span class="avatar">{{ auth()->user()->initials ?: 'U' }}</span>
+                                <span class="user-dropdown-btn__who">
+                                    <span class="user-dropdown-btn__name">{{ auth()->user()->name }}</span>
+                                    <span class="lbl">
+                                        @if(auth()->user()->isAdmin()) administrador
+                                        @elseif(auth()->user()->isTeacher()) profesor/a
+                                        @else estudiante
+                                        @endif
+                                    </span>
+                                </span>
+                                <x-icon name="chevron-down" :size="16" class="dropdown-chevron" />
+                            </button>
+                            <div class="user-dropdown-menu" id="userMenuDropdown" role="menu" aria-labelledby="userMenuBtn">
+                                <div class="dropdown-header">
+                                    <span class="dropdown-user-name">{{ auth()->user()->full_name }}</span>
+                                    <span class="dropdown-user-email">{{ auth()->user()->email }}</span>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                @if(auth()->user()->isAdmin())
+                                    <a href="{{ route('admin.dashboard') }}" class="dropdown-item" role="menuitem">admin</a>
+                                @endif
+                                @if(auth()->user()->isStudent())
+                                    <a href="{{ route('student.profile') }}" class="dropdown-item {{ request()->routeIs('student.profile') ? 'active' : '' }}" role="menuitem">mi-perfil</a>
+                                    <a href="{{ route('student.enrollments') }}" class="dropdown-item {{ request()->routeIs('student.enrollments') ? 'active' : '' }}" role="menuitem">mis-matrículas</a>
+                                @endif
+                                <a href="{{ route('settings.index') }}" class="dropdown-item {{ request()->routeIs('settings.index') ? 'active' : '' }}" role="menuitem">ajustes</a>
+                                <div class="dropdown-divider"></div>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item dropdown-item--danger" role="menuitem">cerrar sesión</button>
+                                </form>
+                            </div>
+                        </div>
+                    @endguest
 
-    {{-- Main Content --}}
-    <main class="main-content" id="mainContent">
-        @yield('content')
-    </main>
-
-    {{-- Footer --}}
-    <footer class="footer">
-        <div class="footer-grid">
-            <div class="footer-brand">
-                <div class="footer-logo-row">
-                    <img src="{{ asset('images/logo-claro.png') }}" alt="ZiberEibar Logo" class="navbar-logo navbar-logo-light footer-logo">
-                    <img src="{{ asset('images/logo-oscuro.png') }}" alt="ZiberEibar Logo" class="navbar-logo navbar-logo-dark footer-logo">
-                    <h3>ZiberEibar</h3>
+                    <button type="button" class="icon-btn navbar-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navbarLinks">
+                        <x-icon name="menu" :size="22" />
+                    </button>
                 </div>
-                <p>Centro de formación profesional comprometido con la excelencia educativa y el desarrollo integral de nuestros estudiantes.</p>
             </div>
-            <div class="footer-section">
-                <h4>Navegación</h4>
-                <ul class="footer-links">
-                    <li><a href="{{ route('home') }}">Inicio</a></li>
-                    <li><a href="{{ route('courses.index') }}">Cursos</a></li>
-                    <li><a href="{{ route('about') }}">Información</a></li>
-                </ul>
+        </header>
+
+        @hasSection('no_flash')
+        @else
+            @if(session('success') || session('error'))
+                <div class="container flash-stack">
+                    @if(session('success'))
+                        <x-alert type="success" class="fx-fade" data-auto-hide>{{ session('success') }}</x-alert>
+                    @endif
+                    @if(session('error'))
+                        <x-alert type="error" class="fx-fade">{{ session('error') }}</x-alert>
+                    @endif
+                </div>
+            @endif
+        @endif
+
+        <main id="mainContent" tabindex="-1">
+            @yield('content')
+        </main>
+
+        <footer class="footer">
+            <div class="footer__inner">
+                <div class="footer__col">
+                    <a href="{{ route('home') }}" class="brand">
+                        <img src="{{ asset('images/logo-oscuro.png') }}" alt="" class="logo-on-dark">
+                        <img src="{{ asset('images/logo-claro.png') }}" alt="" class="logo-on-light">
+                        <span>ziber_eibar</span>
+                    </a>
+                    <span>Centro de formación profesional · Eibar, Gipuzkoa</span>
+                </div>
+                <div class="footer__col">
+                    <span class="lbl">contacto</span>
+                    <a href="mailto:info@zibereibar.eus">info@zibereibar.eus</a>
+                    <a href="tel:+34900000000">900 000 000</a>
+                    <span>Calle Educación, 1</span>
+                </div>
+                <div class="footer__col">
+                    <span class="lbl">navegación</span>
+                    <a href="{{ route('courses.index') }}">~/cursos</a>
+                    <a href="{{ route('about') }}">~/información</a>
+                    <a href="{{ route('settings.index') }}">~/ajustes</a>
+                </div>
+                <span>&copy; {{ date('Y') }} ZiberEibar</span>
             </div>
-            <div class="footer-section">
-                <h4>Contacto</h4>
-                <ul class="footer-links">
-                    <li><a href="mailto:info@zibereibar.es">info@zibereibar.es</a></li>
-                    <li><a href="tel:+34900000000">900 000 000</a></li>
-                    <li><a href="#">Calle Educación, 1</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            &copy; {{ date('Y') }} ZiberEibar. Todos los derechos reservados.
-        </div>
-    </footer>
+        </footer>
+    </div>
 
     <script src="{{ asset('js/app.js') }}?v={{ filemtime(public_path('js/app.js')) }}"></script>
 </body>

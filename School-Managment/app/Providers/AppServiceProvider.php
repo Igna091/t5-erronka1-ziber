@@ -2,9 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\Course;
+use App\Models\Enrollment;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
@@ -35,5 +40,17 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('login', fn (Request $request) => [
             Limit::perMinute(60)->by('login-ip:'.$request->ip()),
         ]);
+
+        Paginator::defaultView('vendor.pagination.senal');
+        Paginator::defaultSimpleView('vendor.pagination.senal');
+
+        // Counters in the admin sidebar
+        View::composer('layouts.admin', function ($view) {
+            $view->with('adminCounts', [
+                'students' => User::students()->count(),
+                'courses' => Course::count(),
+                'enrollments' => Enrollment::where('status', 'active')->count(),
+            ]);
+        });
     }
 }

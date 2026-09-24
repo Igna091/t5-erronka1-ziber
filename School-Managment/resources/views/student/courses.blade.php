@@ -3,76 +3,22 @@
 @section('title', 'Cursos - ZiberEibar')
 
 @section('content')
-<div class="student-page">
-    <div class="student-page-header">
-        <h1>Cursos disponibles</h1>
-        <p>Explora nuestra oferta formativa y matricúlate en los cursos que te interesen.</p>
+<section class="container page-top">
+    <div class="section-head">
+        <div class="section-head__title">
+            <span class="kicker fx-fade">~/cursos</span>
+            <h1 class="h-page"><span class="fx-type">Cursos abiertos.</span></h1>
+        </div>
+        <p class="fx-fade" style="--d: 0.6s">{{ $courses->count() }} {{ $courses->count() === 1 ? 'curso disponible' : 'cursos disponibles' }}. Para matricularte necesitas tu cuenta de alumno activada.</p>
     </div>
 
-    @if($courses->count() > 0)
-        <div class="courses-grid">
-            @foreach($courses as $course)
-                <div class="course-card">
-                    <div class="course-card-header">
-                        <span class="course-card-code">{{ $course->code }}</span>
-                    </div>
-                    <div class="course-card-body">
-                        <h3>{{ $course->name }}</h3>
-                        <p>{{ $course->description ?? 'Sin descripción disponible.' }}</p>
-                    </div>
-                    <div class="course-card-meta">
-                        @if($course->duration_hours)
-                            <span class="course-card-meta-item">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-                                {{ $course->duration_hours }}h
-                            </span>
-                        @endif
-                        @if($course->capacity)
-                            <span class="course-card-meta-item">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>
-                                {{ $course->available_spots }}/{{ $course->capacity }} plazas
-                            </span>
-                        @endif
-                        @if($course->start_date)
-                            <span class="course-card-meta-item">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/></svg>
-                                {{ $course->start_date->format('d/m/Y') }}
-                            </span>
-                        @endif
-                    </div>
-                    <div class="course-card-footer">
-                        <a href="{{ route('courses.show', $course) }}" class="btn btn-outline btn-sm">Ver detalle</a>
-
-                        @auth
-                            @if(auth()->user()->isStudent())
-                                @php
-                                    $isEnrolled = \App\Models\Enrollment::where('student_id', auth()->id())
-                                        ->where('course_id', $course->id)
-                                        ->where('status', 'active')
-                                        ->exists();
-                                @endphp
-                                @if($isEnrolled)
-                                    <span class="badge badge-success">Matriculado</span>
-                                @else
-                                    <form method="POST" action="{{ route('courses.enroll', $course) }}">
-                                        @csrf
-                                        <button type="submit" class="btn btn-success btn-sm">Matricularme</button>
-                                    </form>
-                                @endif
-                            @endif
-                        @else
-                            <a href="{{ route('login') }}" class="btn btn-ghost btn-sm">Iniciar sesión para matricularte</a>
-                        @endauth
-                    </div>
-                </div>
-            @endforeach
-        </div>
+    @if ($courses->isNotEmpty())
+        @include('partials.course-browser')
     @else
-        <div class="empty-state">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a23.838 23.838 0 0 0-1.012 5.434c0 .043.016.086.044.124a23.77 23.77 0 0 0 4.454-1.601M4.26 10.147A23.96 23.96 0 0 1 12 8.443a23.96 23.96 0 0 1 7.74 1.704M4.26 10.147 12 6l7.74 4.147M12 6V3"/></svg>
-            <h3>No hay cursos disponibles</h3>
-            <p>Próximamente añadiremos nuevos cursos.</p>
+        <div class="panel empty">
+            <span class="empty__cmd">ls cursos/ <span class="muted">— vacío</span></span>
+            <span>Todavía no hay cursos abiertos. Vuelve pronto.</span>
         </div>
     @endif
-</div>
+</section>
 @endsection

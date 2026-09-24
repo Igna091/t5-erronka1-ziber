@@ -1,84 +1,95 @@
 @extends('layouts.admin')
 
 @section('title', 'Cursos')
-@section('header', 'Cursos')
+@section('path', 'cursos')
+
+@section('header_actions')
+    <a href="{{ route('admin.courses.create') }}" class="btn btn-primary btn-sm"><x-icon name="plus" :size="16" />Nuevo curso</a>
+@endsection
 
 @section('content')
 <div class="page-header">
-    <h1>Gestión de cursos</h1>
-    <div class="page-header-actions">
-        <a href="{{ route('admin.courses.create') }}" class="btn btn-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-            Nuevo curso
-        </a>
+    <div class="page-header__title">
+        <h1 class="h-admin"><span class="fx-type">Cursos.</span></h1>
+        <span class="text-2">{{ $courses->total() }} {{ $courses->total() === 1 ? 'curso' : 'cursos' }}{{ request()->hasAny(['search', 'status']) ? ' con estos filtros' : '' }}</span>
     </div>
 </div>
 
-<form method="GET" action="{{ route('admin.courses.index') }}" class="search-bar">
+<form method="GET" action="{{ route('admin.courses.index') }}" class="search-bar" role="search">
     <div class="search-input-wrapper">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
-        <input type="text" name="search" class="form-input" placeholder="Buscar por nombre o código..." value="{{ request('search') }}">
+        <label for="search" class="sr-only">Buscar cursos</label>
+        <input type="search" id="search" name="search" class="form-input" placeholder="buscar por nombre o código…" value="{{ request('search') }}">
     </div>
     <select name="status" class="form-select" data-auto-submit aria-label="Filtrar por estado">
-        <option value="">Todos los estados</option>
-        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Activos</option>
-        <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactivos</option>
+        <option value="">todos los estados</option>
+        <option value="active" @selected(request('status') === 'active')>activos</option>
+        <option value="inactive" @selected(request('status') === 'inactive')>inactivos</option>
     </select>
-    <button type="submit" class="btn btn-secondary">Buscar</button>
+    <button type="submit" class="btn btn-ghost">buscar</button>
 </form>
 
-<div class="table-wrapper">
+<div class="table-wrapper fx-fade" style="--d: 0.15s">
     <table class="table">
         <thead>
             <tr>
-                <th>Código</th>
-                <th>Nombre</th>
-                <th>Duración</th>
-                <th>Plazas</th>
-                <th>Matriculados</th>
-                <th>Estado</th>
-                <th>Acciones</th>
+                <th>código</th>
+                <th>curso</th>
+                <th>duración</th>
+                <th>ocupación</th>
+                <th>estado</th>
+                <th><span class="sr-only">acciones</span></th>
             </tr>
         </thead>
         <tbody>
-            @forelse($courses as $course)
+            @forelse ($courses as $course)
+                @php
+                    $used = $course->enrollments_count;
+                    $lit = $course->capacity ? ($used > 0 ? max(1, (int) round($used / $course->capacity * 12)) : 0) : 0;
+                @endphp
                 <tr>
-                    <td><span class="course-card-code">{{ $course->code }}</span></td>
-                    <td style="font-weight:500;">{{ $course->name }}</td>
-                    <td>{{ $course->duration_hours ? $course->duration_hours . 'h' : '—' }}</td>
-                    <td>{{ $course->capacity ?? '∞' }}</td>
-                    <td>{{ $course->enrollments_count }}</td>
+                    <td class="t-code">{{ $course->code }}</td>
                     <td>
-                        @if($course->status === 'active')
-                            <span class="badge badge-success">Activo</span>
+                        <a href="{{ route('admin.courses.show', $course) }}" style="display: flex; flex-direction: column; color: var(--text); text-decoration: none;">
+                            <span class="t-main">{{ $course->name }}</span>
+                            <span class="t-sub">{{ $course->academic_year_label ? 'curso '.$course->academic_year_label : 'sin fecha de inicio' }}</span>
+                        </a>
+                    </td>
+                    <td>{{ $course->duration_hours ? $course->duration_hours.' h' : '—' }}</td>
+                    <td>
+                        <span style="display: flex; align-items: center; gap: 0.75rem;">
+                            <span class="segbar" aria-hidden="true">
+                                @for ($i = 0; $i < 12; $i++)
+                                    <i class="seg {{ $i < $lit ? 'is-on' : '' }}" style="width: 7px; height: 14px;"></i>
+                                @endfor
+                            </span>
+                            <span class="t-sub" style="color: var(--text-2);">{{ $used }}/{{ $course->capacity ?? '∞' }}</span>
+                        </span>
+                    </td>
+                    <td>
+                        @if ($course->isActive())
+                            <span class="status status--ok">activo</span>
                         @else
-                            <span class="badge badge-neutral">Inactivo</span>
+                            <span class="status status--off">inactivo</span>
                         @endif
                     </td>
                     <td>
                         <div class="table-actions">
-                            <a href="{{ route('admin.courses.show', $course) }}" class="btn btn-ghost btn-icon" title="Ver">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                            </a>
-                            <a href="{{ route('admin.courses.edit', $course) }}" class="btn btn-ghost btn-icon" title="Editar">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/></svg>
-                            </a>
-                            <form method="POST" action="{{ route('admin.courses.destroy', $course) }}" style="display:inline;">
+                            <a href="{{ route('admin.courses.show', $course) }}" class="btn btn-ghost btn-icon" aria-label="Ver {{ $course->name }}"><x-icon name="eye" :size="16" /></a>
+                            <a href="{{ route('admin.courses.edit', $course) }}" class="btn btn-ghost btn-icon" aria-label="Editar {{ $course->name }}"><x-icon name="edit" :size="16" /></a>
+                            <form method="POST" action="{{ route('admin.courses.destroy', $course) }}">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-ghost btn-icon" title="Eliminar" data-confirm="¿Estás seguro de que deseas eliminar el curso {{ $course->name }}?" style="color:var(--danger);">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
-                                </button>
+                                <button type="submit" class="btn btn-danger btn-icon" aria-label="Eliminar {{ $course->name }}" data-confirm="¿Eliminar el curso «{{ $course->name }}»? No se puede eliminar si tiene matrículas activas."><x-icon name="trash" :size="16" /></button>
                             </form>
                         </div>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7">
-                        <div class="empty-state">
-                            <h3>No se encontraron cursos</h3>
-                            <p>Crea un nuevo curso para comenzar.</p>
+                    <td colspan="6">
+                        <div class="empty">
+                            <span class="empty__cmd">ls cursos/ <span class="muted">— sin resultados</span></span>
+                            <span>{{ request()->hasAny(['search', 'status']) ? 'Prueba con otra búsqueda.' : 'Crea el primer curso para empezar.' }}</span>
                         </div>
                     </td>
                 </tr>
@@ -87,9 +98,5 @@
     </table>
 </div>
 
-@if($courses->hasPages())
-    <div class="pagination">
-        {{ $courses->links() }}
-    </div>
-@endif
+{{ $courses->links() }}
 @endsection

@@ -158,6 +158,16 @@ class User extends Authenticatable
     }
 
     /**
+     * IDs of the courses this student is actively enrolled in.
+     *
+     * @return list<int>
+     */
+    public function activeCourseIds(): array
+    {
+        return $this->enrollments()->where('status', 'active')->pluck('course_id')->all();
+    }
+
+    /**
      * Get the course subjects this teacher teaches.
      */
     public function taughtSubjects(): HasMany

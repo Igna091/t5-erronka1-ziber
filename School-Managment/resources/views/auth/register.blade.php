@@ -1,66 +1,54 @@
 @extends('layouts.public')
 
-@section('title', 'Registrarse - ZiberEibar')
+@section('title', 'Reenviar activación - ZiberEibar')
+@section('no_flash', true)
 
 @section('content')
-<div class="auth-page">
-    <div class="auth-card">
-        <div class="auth-header">
-            <a href="{{ route('home') }}" class="auth-brand" title="ZiberEibar">
-                <img src="{{ asset('images/logo-claro.png') }}" alt="ZiberEibar Logo" class="auth-logo auth-logo-light">
-                <img src="{{ asset('images/logo-oscuro.png') }}" alt="ZiberEibar Logo" class="auth-logo auth-logo-dark">
-            </a>
-            <h1>Registrarse</h1>
-            <p>Activa tu cuenta de alumno en ZiberEibar</p>
-        </div>
-
-        <div class="alert alert-info" style="margin-bottom:1.5rem;">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/></svg>
-            <span>Para registrarte, el administrador debe haberte dado de alta previamente. Introduce tu email y DNI registrados.</span>
-        </div>
-
-        @if($errors->any())
-            <div class="alert alert-error">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
-                <div>
-                    @foreach($errors->all() as $error)
-                        <div>{{ $error }}</div>
-                    @endforeach
-                </div>
-            </div>
+<section class="container auth" style="align-items: center;">
+    <div class="auth__copy">
+        @if (session('error'))
+            <x-alert type="warning" class="fx-fade">{{ session('error') }}</x-alert>
         @endif
 
-        <form method="POST" action="{{ route('register') }}">
-            @csrf
+        <span class="kicker fx-fade">activación // reenviar enlace</span>
+        <h1 class="h-page">
+            <span class="fx-type">¿No te llegó</span>
+            <span class="fx-type acc" style="--d: 0.7s">el email?<span class="cursor" aria-hidden="true"></span></span>
+        </h1>
+        <p class="lead fx-fade" style="--d: 1.2s">Escribe el email con el que te dio de alta el centro. Si tu cuenta está pendiente de activar, te enviaremos un enlace nuevo y el anterior dejará de funcionar.</p>
 
-            <div class="form-group">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" id="email" name="email" class="form-input" value="{{ old('email') }}" required autofocus placeholder="tu@email.com">
-                <span class="form-help">Debe coincidir con el email registrado por el administrador.</span>
+        @if (session('success'))
+            <div class="panel panel--acc" role="status" style="padding: 1.125rem 1.25rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <span class="acc fx-tl" style="font-weight: 700;">[ok] solicitud recibida</span>
+                <span class="fx-fade" style="--d: 0.4s;">{{ session('success') }}</span>
+                <a href="{{ route('login') }}" class="link-arrow">ir a iniciar sesión</a>
             </div>
+        @else
+            <form method="POST" action="{{ route('register') }}" class="fx-fade" style="--d: 1.3s; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-end;">
+                @csrf
+                <div class="form-group" style="flex: 1 1 18rem;">
+                    <label for="email" class="form-label">email</label>
+                    <input type="email" id="email" name="email" class="form-input {{ $errors->has('email') ? 'is-invalid' : '' }}" value="{{ old('email') }}" required autocomplete="email" placeholder="tu@email.com">
+                </div>
+                <button type="submit" class="btn btn-primary">Reenviar enlace</button>
+                @error('email')
+                    <span class="form-error" style="flex-basis: 100%;">{{ $message }}</span>
+                @enderror
+            </form>
+        @endif
 
-            <div class="form-group">
-                <label for="dni" class="form-label">DNI / NIE</label>
-                <input type="text" id="dni" name="dni" class="form-input" value="{{ old('dni') }}" required placeholder="12345678A">
-                <span class="form-help">Debe coincidir con el DNI registrado por el administrador.</span>
-            </div>
-
-            <div class="form-group">
-                <label for="password" class="form-label">Contraseña</label>
-                <input type="password" id="password" name="password" class="form-input" required placeholder="Mínimo 8 caracteres">
-            </div>
-
-            <div class="form-group">
-                <label for="password_confirmation" class="form-label">Confirmar contraseña</label>
-                <input type="password" id="password_confirmation" name="password_confirmation" class="form-input" required placeholder="Repite la contraseña">
-            </div>
-
-            <button type="submit" class="btn btn-primary w-full">Activar cuenta</button>
-        </form>
-
-        <div class="auth-footer">
-            ¿Ya tienes cuenta? <a href="{{ route('login') }}">Iniciar sesión</a>
+        <div class="fx-fade small muted" style="--d: 1.5s; display: flex; flex-wrap: wrap; gap: 0.5rem 2rem;">
+            <span><span class="acc">›</span> el enlace caduca en 7 días</span>
+            <span><span class="acc">›</span> un envío por minuto</span>
+            <span><span class="acc">›</span> mira en spam</span>
         </div>
     </div>
-</div>
+
+    <div aria-hidden="true" style="display: grid; place-items: center; min-height: 20rem;">
+        <div class="envelope fx-float">
+            <svg viewBox="0 0 240 168" preserveAspectRatio="none" fill="none"><path d="M2 2 L120 92 L238 2" style="stroke: var(--acc);" stroke-width="2"/></svg>
+            <span>activar_cuenta.lnk</span>
+        </div>
+    </div>
+</section>
 @endsection

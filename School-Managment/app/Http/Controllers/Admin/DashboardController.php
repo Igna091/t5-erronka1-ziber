@@ -15,12 +15,21 @@ class DashboardController extends Controller
      */
     public function index()
     {
+        $activeCount = ['enrollments' => fn ($query) => $query->where('status', 'active')];
+
+        // Spots in active courses that have a capacity limit
+        $limitedCourses = Course::where('status', 'active')->whereNotNull('capacity')->withCount($activeCount)->get();
+
         $stats = [
             'total_students' => User::students()->count(),
             'registered_students' => User::students()->where('is_registered', true)->count(),
+            'pending_students' => User::students()->where('is_registered', false)->count(),
             'total_courses' => Course::count(),
             'active_courses' => Course::where('status', 'active')->count(),
             'total_enrollments' => Enrollment::where('status', 'active')->count(),
+            'cancelled_enrollments' => Enrollment::where('status', 'cancelled')->count(),
+            'total_seats' => $limitedCourses->sum('capacity'),
+            'free_seats' => $limitedCourses->sum(fn (Course $course) => $course->available_spots),
         ];
 
         $recentStudents = User::students()
@@ -33,11 +42,10 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        $courses = Course::withCount(['enrollments' => function ($query) {
-                $query->where('status', 'active');
-            }])
+        $courses = Course::withCount($activeCount)
+            ->orderBy('status')
             ->orderBy('name')
-            ->take(5)
+            ->take(8)
             ->get();
 
         return view('admin.dashboard', compact('stats', 'recentStudents', 'recentEnrollments', 'courses'));
