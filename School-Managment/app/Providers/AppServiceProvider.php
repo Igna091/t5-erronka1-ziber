@@ -48,6 +48,7 @@ class AppServiceProvider extends ServiceProvider
         View::composer('layouts.admin', function ($view) {
             $view->with('adminCounts', [
                 'students' => User::students()->count(),
+                'pending' => User::students()->where('is_registered', false)->count(),
                 'courses' => Course::count(),
                 'enrollments' => Enrollment::where('status', 'active')->count(),
             ]);

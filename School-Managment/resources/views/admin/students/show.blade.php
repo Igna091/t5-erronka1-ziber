@@ -46,7 +46,7 @@
     @if ($activationInfo)
         @php
             $sentAt = $activationInfo['sentAt'];
-            $expired = $activationInfo['expiresAt']?->isPast();
+            $expired = $activationInfo['expired'];
         @endphp
         <section class="panel panel--warn fx-fade" style="--d: 0.3s">
             <div class="panel__head"><h2 class="lbl">activación de la cuenta</h2><span class="xs warn">pendiente</span></div>

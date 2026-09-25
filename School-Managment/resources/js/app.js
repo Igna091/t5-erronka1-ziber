@@ -398,13 +398,14 @@ document.addEventListener('DOMContentLoaded', function () {
         let left = parseInt(btn.getAttribute('data-countdown'), 10);
         if (!(left > 0)) return;
 
-        const label = btn.textContent;
+        // Keep the original content (icon + text) to restore it afterwards
+        const original = Array.from(btn.childNodes).map(function (node) { return node.cloneNode(true); });
         btn.disabled = true;
 
         function tick() {
             if (left <= 0) {
                 btn.disabled = false;
-                btn.textContent = label;
+                btn.replaceChildren.apply(btn, original);
                 return;
             }
             btn.textContent = 'Espera ' + left + ' s';

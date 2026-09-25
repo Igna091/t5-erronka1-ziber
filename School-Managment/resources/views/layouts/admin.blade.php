@@ -25,33 +25,22 @@
 
             <nav class="sidebar-nav" aria-label="Secciones">
                 <span class="sidebar-section-title">sistema</span>
-                <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" @if(request()->routeIs('admin.dashboard')) aria-current="page" @endif><span>~/panel</span></a>
-                <a href="{{ route('admin.students.index') }}" class="sidebar-link {{ request()->routeIs('admin.students.*') ? 'active' : '' }}" @if(request()->routeIs('admin.students.*')) aria-current="page" @endif><span>~/alumnos</span><span class="count">{{ $adminCounts['students'] ?? '' }}</span></a>
-                <a href="{{ route('admin.courses.index') }}" class="sidebar-link {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}" @if(request()->routeIs('admin.courses.*')) aria-current="page" @endif><span>~/cursos</span><span class="count">{{ $adminCounts['courses'] ?? '' }}</span></a>
-                <a href="{{ route('admin.enrollments.index') }}" class="sidebar-link {{ request()->routeIs('admin.enrollments.*') ? 'active' : '' }}" @if(request()->routeIs('admin.enrollments.*')) aria-current="page" @endif><span>~/matrículas</span><span class="count">{{ $adminCounts['enrollments'] ?? '' }}</span></a>
+                <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" @if(request()->routeIs('admin.dashboard')) aria-current="page" @endif><x-icon name="dashboard" class="sidebar-link__icon" /><span class="sidebar-link__label">panel</span></a>
+                <a href="{{ route('admin.students.index') }}" class="sidebar-link {{ request()->routeIs('admin.students.*') ? 'active' : '' }}" @if(request()->routeIs('admin.students.*')) aria-current="page" @endif><x-icon name="users" class="sidebar-link__icon" /><span class="sidebar-link__label">alumnos</span><span class="count">{{ $adminCounts['students'] ?? '' }}</span></a>
+                <a href="{{ route('admin.courses.index') }}" class="sidebar-link {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}" @if(request()->routeIs('admin.courses.*')) aria-current="page" @endif><x-icon name="book" class="sidebar-link__icon" /><span class="sidebar-link__label">cursos</span><span class="count">{{ $adminCounts['courses'] ?? '' }}</span></a>
+                <a href="{{ route('admin.enrollments.index') }}" class="sidebar-link {{ request()->routeIs('admin.enrollments.*') ? 'active' : '' }}" @if(request()->routeIs('admin.enrollments.*')) aria-current="page" @endif><x-icon name="clipboard" class="sidebar-link__icon" /><span class="sidebar-link__label">matrículas</span><span class="count">{{ $adminCounts['enrollments'] ?? '' }}</span></a>
             </nav>
 
             <nav class="sidebar-nav" aria-label="Atajos">
                 <span class="sidebar-section-title">atajos</span>
-                <a href="{{ route('admin.students.create') }}" class="sidebar-link sidebar-link--plus"><span>nuevo alumno</span></a>
-                <a href="{{ route('admin.courses.create') }}" class="sidebar-link sidebar-link--plus"><span>nuevo curso</span></a>
-                <a href="{{ route('admin.enrollments.create') }}" class="sidebar-link sidebar-link--plus"><span>matricular alumno</span></a>
+                <a href="{{ route('admin.students.create') }}" class="sidebar-link sidebar-link--plus"><x-icon name="user-plus" class="sidebar-link__icon" /><span class="sidebar-link__label">nuevo alumno</span></a>
+                <a href="{{ route('admin.courses.create') }}" class="sidebar-link sidebar-link--plus"><x-icon name="book-plus" class="sidebar-link__icon" /><span class="sidebar-link__label">nuevo curso</span></a>
+                <a href="{{ route('admin.enrollments.create') }}" class="sidebar-link sidebar-link--plus"><x-icon name="clipboard-plus" class="sidebar-link__icon" /><span class="sidebar-link__label">matricular alumno</span></a>
+                <a href="{{ route('admin.activations.index') }}" class="sidebar-link sidebar-link--plus {{ request()->routeIs('admin.activations.*') ? 'active' : '' }}" @if(request()->routeIs('admin.activations.*')) aria-current="page" @endif><x-icon name="mail-send" class="sidebar-link__icon" /><span class="sidebar-link__label">reenviar activación</span>@if (!empty($adminCounts['pending']))<span class="count count--warn" title="alumnos pendientes de activar">{{ $adminCounts['pending'] }}</span>@endif</a>
             </nav>
 
             <div class="sidebar-footer">
-                <a href="{{ route('settings.index') }}" class="sidebar-link"><span>~/ajustes</span></a>
-                <a href="{{ route('home') }}" class="sidebar-link"><span>ver web pública</span><x-icon name="external" :size="14" /></a>
-                <div class="sidebar-user">
-                    <span class="avatar">{{ auth()->user()->initials ?: 'A' }}</span>
-                    <div class="sidebar-user__who">
-                        <span>{{ auth()->user()->name }}</span>
-                        <span class="lbl">administrador</span>
-                    </div>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="icon-btn" aria-label="Cerrar sesión" style="border: 0;"><x-icon name="logout" /></button>
-                    </form>
-                </div>
+                <a href="{{ route('home') }}" class="sidebar-link"><x-icon name="globe" class="sidebar-link__icon" /><span class="sidebar-link__label">ver web pública</span><x-icon name="external" :size="14" /></a>
             </div>
         </aside>
 
@@ -59,14 +48,14 @@
             <header class="admin-header">
                 <div class="admin-header__left">
                     <button type="button" class="icon-btn sidebar-toggle" aria-label="Abrir menú"><x-icon name="menu" :size="20" /></button>
-                    <span class="admin-path">admin@zibereibar:<strong>~/@yield('path', 'panel')</strong>$</span>
+                    <span class="admin-path">admin <span class="crumbs__sep">/</span> <strong>{{ str_replace('/', ' / ', $__env->yieldContent('path', 'panel')) }}</strong></span>
                 </div>
                 <div class="admin-header__right">
-                    @yield('header_actions')
                     <button type="button" class="icon-btn theme-toggle" aria-label="Cambiar entre tema oscuro y claro">
                         <x-icon name="moon" class="icon-moon" />
                         <x-icon name="sun" class="icon-sun" />
                     </button>
+                    @include('partials.user-menu')
                 </div>
             </header>
 

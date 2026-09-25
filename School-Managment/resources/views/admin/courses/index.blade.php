@@ -3,10 +3,6 @@
 @section('title', 'Cursos')
 @section('path', 'cursos')
 
-@section('header_actions')
-    <a href="{{ route('admin.courses.create') }}" class="btn btn-primary btn-sm"><x-icon name="plus" :size="16" />Nuevo curso</a>
-@endsection
-
 @section('content')
 <div class="page-header">
     <div class="page-header__title">

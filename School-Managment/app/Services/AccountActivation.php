@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Notifications\ActivateAccount;
 use Illuminate\Auth\Passwords\PasswordBroker;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -74,39 +75,43 @@ class AccountActivation
     }
 
     /**
-     * When the current activation link was sent (null if there is none).
+     * Status of the current activation link of several students, with one query.
+     * Keyed by user id: sentAt / expiresAt (null if there is no link), expired,
+     * cooldown (seconds before another email can be sent, 0 = now).
+     *
+     * @param  Collection<int, User>  $students
+     * @return array<int, array{sentAt: ?Carbon, expiresAt: ?Carbon, expired: bool, cooldown: int}>
      */
-    public function lastSentAt(User $student): ?Carbon
+    public function statusFor(Collection $students): array
     {
-        $createdAt = DB::table(config('auth.passwords.activations.table'))
-            ->where('email', $student->email)
-            ->value('created_at');
+        $sentAt = DB::table(config('auth.passwords.activations.table'))
+            ->whereIn('email', $students->pluck('email'))
+            ->pluck('created_at', 'email');
 
-        return $createdAt ? Carbon::parse($createdAt) : null;
-    }
-
-    /**
-     * When the current activation link stops working (null if there is none).
-     */
-    public function expiresAt(User $student): ?Carbon
-    {
-        return $this->lastSentAt($student)?->addMinutes((int) config('auth.passwords.activations.expire'));
-    }
-
-    /**
-     * Seconds left before another email can be sent (0 = can send now).
-     */
-    public function secondsUntilResend(User $student): int
-    {
-        $sentAt = $this->lastSentAt($student);
-
-        if (!$sentAt) {
-            return 0;
-        }
-
+        $expire = (int) config('auth.passwords.activations.expire');
         $throttle = (int) config('auth.passwords.activations.throttle', 60);
 
-        return max(0, (int) ceil($throttle - $sentAt->diffInSeconds(now(), true)));
+        return $students->mapWithKeys(function (User $student) use ($sentAt, $expire, $throttle) {
+            $sent = isset($sentAt[$student->email]) ? Carbon::parse($sentAt[$student->email]) : null;
+            $expiresAt = $sent?->copy()->addMinutes($expire);
+
+            return [$student->id => [
+                'sentAt' => $sent,
+                'expiresAt' => $expiresAt,
+                'expired' => (bool) $expiresAt?->isPast(),
+                'cooldown' => $sent ? max(0, (int) ceil($throttle - $sent->diffInSeconds(now(), true))) : 0,
+            ]];
+        })->all();
+    }
+
+    /**
+     * Status of one student's activation link (see statusFor()).
+     *
+     * @return array{sentAt: ?Carbon, expiresAt: ?Carbon, expired: bool, cooldown: int}
+     */
+    public function statusOf(User $student): array
+    {
+        return $this->statusFor(new Collection([$student]))[$student->id];
     }
 
     /**

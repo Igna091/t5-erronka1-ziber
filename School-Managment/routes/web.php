@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ActivationController;
 use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EnrollmentController;
@@ -87,6 +88,10 @@ Route::middleware(['auth', 'admin'])->prefix('administracion')->name('admin.')->
         'destroy' => 'students.destroy',
     ])->parameters(['alumnos' => 'student']);
     Route::post('/alumnos/{student}/reenviar-activacion', [StudentController::class, 'resendActivation'])->name('students.resend-activation');
+
+    // Pending account activations
+    Route::get('/activaciones', [ActivationController::class, 'index'])->name('activations.index');
+    Route::post('/activaciones/reenviar', [ActivationController::class, 'resendAll'])->name('activations.resend-all');
 
     // Courses CRUD
     Route::resource('cursos', AdminCourseController::class)->names([

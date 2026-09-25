@@ -129,11 +129,7 @@ class StudentController extends Controller
         $student->load(['enrollments' => fn ($q) => $q->latest('enrolled_at'), 'enrollments.course']);
 
         // Activation status for pending students (last email, expiry, resend cooldown)
-        $activationInfo = $student->is_registered ? null : [
-            'sentAt' => $activation->lastSentAt($student),
-            'expiresAt' => $activation->expiresAt($student),
-            'cooldown' => $activation->secondsUntilResend($student),
-        ];
+        $activationInfo = $student->is_registered ? null : $activation->statusOf($student);
 
         return view('admin.students.show', compact('student', 'activationInfo'));
     }

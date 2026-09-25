@@ -3,10 +3,6 @@
 @section('title', 'Matrículas')
 @section('path', 'matrículas')
 
-@section('header_actions')
-    <a href="{{ route('admin.enrollments.create') }}" class="btn btn-primary btn-sm"><x-icon name="plus" :size="16" />Matricular alumno</a>
-@endsection
-
 @section('content')
 <div class="page-header">
     <div class="page-header__title">

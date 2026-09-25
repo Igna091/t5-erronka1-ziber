@@ -53,41 +53,7 @@
                         <a href="{{ route('register') }}" class="link-quiet hide-mobile">activar cuenta</a>
                         <a href="{{ route('login') }}" class="btn btn-outline btn-bracket btn-sm hide-sm" @if(request()->routeIs('login')) aria-current="page" @endif>iniciar sesión</a>
                     @else
-                        <div class="user-dropdown-wrapper">
-                            <button type="button" class="user-dropdown-btn" id="userMenuBtn" aria-expanded="false" aria-haspopup="true" aria-controls="userMenuDropdown">
-                                <span class="avatar">{{ auth()->user()->initials ?: 'U' }}</span>
-                                <span class="user-dropdown-btn__who">
-                                    <span class="user-dropdown-btn__name">{{ auth()->user()->name }}</span>
-                                    <span class="lbl">
-                                        @if(auth()->user()->isAdmin()) administrador
-                                        @elseif(auth()->user()->isTeacher()) profesor/a
-                                        @else estudiante
-                                        @endif
-                                    </span>
-                                </span>
-                                <x-icon name="chevron-down" :size="16" class="dropdown-chevron" />
-                            </button>
-                            <div class="user-dropdown-menu" id="userMenuDropdown" role="menu" aria-labelledby="userMenuBtn">
-                                <div class="dropdown-header">
-                                    <span class="dropdown-user-name">{{ auth()->user()->full_name }}</span>
-                                    <span class="dropdown-user-email">{{ auth()->user()->email }}</span>
-                                </div>
-                                <div class="dropdown-divider"></div>
-                                @if(auth()->user()->isAdmin())
-                                    <a href="{{ route('admin.dashboard') }}" class="dropdown-item" role="menuitem">admin</a>
-                                @endif
-                                @if(auth()->user()->isStudent())
-                                    <a href="{{ route('student.profile') }}" class="dropdown-item {{ request()->routeIs('student.profile') ? 'active' : '' }}" role="menuitem">mi-perfil</a>
-                                    <a href="{{ route('student.enrollments') }}" class="dropdown-item {{ request()->routeIs('student.enrollments') ? 'active' : '' }}" role="menuitem">mis-matrículas</a>
-                                @endif
-                                <a href="{{ route('settings.index') }}" class="dropdown-item {{ request()->routeIs('settings.index') ? 'active' : '' }}" role="menuitem">ajustes</a>
-                                <div class="dropdown-divider"></div>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item dropdown-item--danger" role="menuitem">cerrar sesión</button>
-                                </form>
-                            </div>
-                        </div>
+                        @include('partials.user-menu')
                     @endguest
 
                     <button type="button" class="icon-btn navbar-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="navbarLinks">
