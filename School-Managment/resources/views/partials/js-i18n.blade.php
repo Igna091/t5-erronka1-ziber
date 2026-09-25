@@ -1,6 +1,6 @@
 {{--
-    Texts used by app.js, in the current language. It's JSON, not a script:
-    the browser doesn't run it, so the CSP (script-src 'self') allows it.
+    Texts used by app.js, in the current language, as JSON in a data attribute
+    (no inline <script>, so nothing clashes with the CSP).
 --}}
 @php
     $jsTexts = [
@@ -15,4 +15,4 @@
         'fontLarge' => __('Tamaño de texto: grande'),
     ];
 @endphp
-<script type="application/json" id="i18n">@json($jsTexts)</script>
+<div id="i18n" data-texts="{{ json_encode($jsTexts) }}" hidden></div>

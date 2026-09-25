@@ -1,38 +1,38 @@
 @extends('layouts.admin')
 
-@section('title', 'Matrículas')
-@section('path', 'matrículas')
+@section('title', __('Matrículas'))
+@section('path', __('matrículas'))
 
 @section('content')
 <div class="page-header">
     <div class="page-header__title">
-        <h1 class="h-admin"><span class="fx-type">Matrículas.</span></h1>
-        <span class="text-2">{{ $enrollments->total() }} {{ $enrollments->total() === 1 ? 'matrícula' : 'matrículas' }}{{ request()->hasAny(['search', 'status']) ? ' con estos filtros' : '' }}</span>
+        <h1 class="h-admin"><span class="fx-type">{{ __('Matrículas.') }}</span></h1>
+        <span class="text-2">{{ trans_choice(':count matrícula|:count matrículas', $enrollments->total()) }}{{ request()->hasAny(['search', 'status']) ? ' '.__('con estos filtros') : '' }}</span>
     </div>
 </div>
 
 <form method="GET" action="{{ route('admin.enrollments.index') }}" class="search-bar" role="search">
     <div class="search-input-wrapper">
-        <label for="search" class="sr-only">Buscar matrículas</label>
-        <input type="search" id="search" name="search" class="form-input" placeholder="buscar por alumno o curso…" value="{{ request('search') }}">
+        <label for="search" class="sr-only">{{ __('Buscar matrículas') }}</label>
+        <input type="search" id="search" name="search" class="form-input" placeholder="{{ __('buscar por alumno o curso…') }}" value="{{ request('search') }}">
     </div>
-    <select name="status" class="form-select" data-auto-submit aria-label="Filtrar por estado">
-        <option value="">todos los estados</option>
-        <option value="active" @selected(request('status') === 'active')>activas</option>
-        <option value="cancelled" @selected(request('status') === 'cancelled')>canceladas</option>
+    <select name="status" class="form-select" data-auto-submit aria-label="{{ __('Filtrar por estado') }}">
+        <option value="">{{ __('todos los estados') }}</option>
+        <option value="active" @selected(request('status') === 'active')>{{ __('activas') }}</option>
+        <option value="cancelled" @selected(request('status') === 'cancelled')>{{ __('canceladas') }}</option>
     </select>
-    <button type="submit" class="btn btn-ghost">buscar</button>
+    <button type="submit" class="btn btn-ghost">{{ __('buscar') }}</button>
 </form>
 
 <div class="table-wrapper fx-fade" style="--d: 0.15s">
     <table class="table">
         <thead>
             <tr>
-                <th>alumno</th>
-                <th>curso</th>
-                <th>fecha</th>
-                <th>estado</th>
-                <th><span class="sr-only">acciones</span></th>
+                <th>{{ __('alumno') }}</th>
+                <th>{{ __('curso') }}</th>
+                <th>{{ __('fecha') }}</th>
+                <th>{{ __('estado') }}</th>
+                <th><span class="sr-only">{{ __('acciones') }}</span></th>
             </tr>
         </thead>
         <tbody>
@@ -58,9 +58,9 @@
                     <td class="t-sub">{{ $enrollment->enrolled_at->format('d.m.Y H:i') }}</td>
                     <td>
                         @if ($enrollment->status === 'active')
-                            <span class="status status--ok">activa</span>
+                            <span class="status status--ok">{{ __('activa') }}</span>
                         @else
-                            <span class="status status--off">cancelada</span>
+                            <span class="status status--off">{{ __('cancelada') }}</span>
                         @endif
                     </td>
                     <td>
@@ -69,13 +69,13 @@
                                 <form method="POST" action="{{ route('admin.enrollments.cancel', $enrollment) }}">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="btn btn-danger btn-sm" data-confirm="¿Cancelar la matrícula de {{ $enrollment->student->full_name ?? 'este alumno' }} en «{{ $enrollment->course->name ?? 'este curso' }}»? Sus notas se conservan.">cancelar</button>
+                                    <button type="submit" class="btn btn-danger btn-sm" data-confirm="{{ __('¿Cancelar la matrícula de :student en «:course»? Sus notas se conservan.', ['student' => $enrollment->student->full_name ?? __('este alumno'), 'course' => $enrollment->course->name ?? __('este curso')]) }}">{{ __('cancelar') }}</button>
                                 </form>
                             @else
                                 <form method="POST" action="{{ route('admin.enrollments.reactivate', $enrollment) }}">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="btn btn-ghost btn-sm">reactivar</button>
+                                    <button type="submit" class="btn btn-ghost btn-sm">{{ __('reactivar') }}</button>
                                 </form>
                             @endif
                         </div>
@@ -85,8 +85,8 @@
                 <tr>
                     <td colspan="5">
                         <div class="empty">
-                            <span class="empty__cmd">ls matrículas/ <span class="muted">— sin resultados</span></span>
-                            <span>{{ request()->hasAny(['search', 'status']) ? 'Prueba con otra búsqueda.' : 'Las matrículas aparecerán aquí.' }}</span>
+                            <span class="empty__cmd">ls {{ __('matrículas') }}/ <span class="muted">— {{ __('sin resultados') }}</span></span>
+                            <span>{{ request()->hasAny(['search', 'status']) ? __('Prueba con otra búsqueda.') : __('Las matrículas aparecerán aquí.') }}</span>
                         </div>
                     </td>
                 </tr>
