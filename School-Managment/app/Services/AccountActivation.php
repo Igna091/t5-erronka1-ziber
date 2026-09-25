@@ -63,7 +63,7 @@ class AccountActivation
         $url = $this->createLink($student);
 
         try {
-            $student->notify((new ActivateAccount($url))->locale('es'));
+            $student->notify(new ActivateAccount($url)); // in the language of whoever triggers it
         } catch (TransportExceptionInterface $e) {
             // Don't leave a link nobody received (and don't block the retry)
             $this->broker()->deleteToken($student);

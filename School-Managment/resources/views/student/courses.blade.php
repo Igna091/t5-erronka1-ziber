@@ -1,23 +1,23 @@
 @extends('layouts.public')
 
-@section('title', 'Cursos - ZiberEibar')
+@section('title', __('Cursos - ZiberEibar'))
 
 @section('content')
 <section class="container page-top">
     <div class="section-head">
         <div class="section-head__title">
-            <span class="kicker fx-fade">// cursos</span>
-            <h1 class="h-page"><span class="fx-type">Cursos abiertos.</span></h1>
+            <span class="kicker fx-fade">// {{ __('cursos') }}</span>
+            <h1 class="h-page"><span class="fx-type">{{ __('Cursos abiertos.') }}</span></h1>
         </div>
-        <p class="fx-fade" style="--d: 0.6s">{{ $courses->count() }} {{ $courses->count() === 1 ? 'curso disponible' : 'cursos disponibles' }}. Para matricularte necesitas tu cuenta de alumno activada.</p>
+        <p class="fx-fade" style="--d: 0.6s">{{ trans_choice(':count curso disponible.|:count cursos disponibles.', $courses->count()) }} {{ __('Para matricularte necesitas tu cuenta de alumno activada.') }}</p>
     </div>
 
     @if ($courses->isNotEmpty())
         @include('partials.course-browser')
     @else
         <div class="panel empty">
-            <span class="empty__cmd">ls cursos/ <span class="muted">— vacío</span></span>
-            <span>Todavía no hay cursos abiertos. Vuelve pronto.</span>
+            <span class="empty__cmd">ls {{ __('cursos') }}/ <span class="muted">— {{ __('vacío') }}</span></span>
+            <span>{{ __('Todavía no hay cursos abiertos. Vuelve pronto.') }}</span>
         </div>
     @endif
 </section>

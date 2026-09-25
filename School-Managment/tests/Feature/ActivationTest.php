@@ -301,7 +301,7 @@ class ActivationTest extends TestCase
         app()->setLocale('es');
         $html = (string) $mail->render();
 
-        $this->assertSame('Activa tu cuenta en EduCenter', $mail->subject);
+        $this->assertSame('Activa tu cuenta en ZiberEibar', $mail->subject);
         $this->assertStringContainsString('¡Hola, Ana!', $html);
         $this->assertStringContainsString(e($url), $html);
         $this->assertStringContainsString('copia y pega este enlace', $html);

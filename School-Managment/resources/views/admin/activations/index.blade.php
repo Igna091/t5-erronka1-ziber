@@ -1,25 +1,25 @@
 @extends('layouts.admin')
 
-@section('title', 'Activaciones pendientes')
-@section('path', 'activaciones')
+@section('title', __('Activaciones pendientes'))
+@section('path', __('activaciones'))
 
 @section('content')
 <div class="page-header">
     <div class="page-header__title">
-        <h1 class="h-admin"><span class="fx-type">Activaciones pendientes.</span></h1>
+        <h1 class="h-admin"><span class="fx-type">{{ __('Activaciones pendientes.') }}</span></h1>
         <span class="text-2">
             @if ($students->isEmpty())
-                Todos los alumnos han activado su cuenta.
+                {{ __('Todos los alumnos han activado su cuenta.') }}
             @else
-                {{ $students->count() }} {{ $students->count() === 1 ? 'alumno no ha' : 'alumnos no han' }} activado su cuenta. Cada enlace caduca a los 7 días y solo se puede enviar un email por minuto a cada alumno.
+                {{ trans_choice(':count alumno no ha activado su cuenta.|:count alumnos no han activado su cuenta.', $students->count()) }} {{ __('Cada enlace caduca a los 7 días y solo se puede enviar un email por minuto a cada alumno.') }}
             @endif
         </span>
     </div>
     @if ($students->isNotEmpty())
         <form method="POST" action="{{ route('admin.activations.resend-all') }}" class="page-header-actions">
             @csrf
-            <button type="submit" class="btn btn-primary" data-confirm="¿Enviar un nuevo email de activación a {{ $students->count() === 1 ? 'el alumno pendiente' : 'los '.$students->count().' alumnos pendientes' }}? Sus enlaces anteriores dejarán de funcionar.">
-                <x-icon name="mail-send" :size="18" />Reenviar a todos ({{ $students->count() }})
+            <button type="submit" class="btn btn-primary" data-confirm="{{ trans_choice('¿Enviar un nuevo email de activación al alumno pendiente? Su enlace anterior dejará de funcionar.|¿Enviar un nuevo email de activación a los :count alumnos pendientes? Sus enlaces anteriores dejarán de funcionar.', $students->count()) }}">
+                <x-icon name="mail-send" :size="18" />{{ __('Reenviar a todos (:count)', ['count' => $students->count()]) }}
             </button>
         </form>
     @endif
@@ -29,11 +29,11 @@
     <table class="table">
         <thead>
             <tr>
-                <th>alumno</th>
-                <th>enlace de activación</th>
-                <th>caduca</th>
-                <th>alta</th>
-                <th><span class="sr-only">acciones</span></th>
+                <th>{{ __('alumno') }}</th>
+                <th>{{ __('enlace de activación') }}</th>
+                <th>{{ __('caduca') }}</th>
+                <th>{{ __('alta') }}</th>
+                <th><span class="sr-only">{{ __('acciones') }}</span></th>
             </tr>
         </thead>
         <tbody>
@@ -50,11 +50,11 @@
                     </td>
                     <td>
                         @if (!$info['sentAt'])
-                            <span class="status status--off">sin enlace vigente</span>
+                            <span class="status status--off">{{ __('sin enlace vigente') }}</span>
                         @elseif ($info['expired'])
-                            <span class="status status--pending">caducado</span>
+                            <span class="status status--pending">{{ __('caducado') }}</span>
                         @else
-                            <span class="status status--ok">enviado {{ $info['sentAt']->locale('es')->diffForHumans() }}</span>
+                            <span class="status status--ok">{{ __('enviado :when', ['when' => $info['sentAt']->diffForHumans()]) }}</span>
                         @endif
                     </td>
                     <td class="t-sub">{{ $info['expiresAt'] && !$info['expired'] ? $info['expiresAt']->format('d.m.Y H:i') : '—' }}</td>
@@ -63,9 +63,9 @@
                         <div class="table-actions">
                             <form method="POST" action="{{ route('admin.students.resend-activation', $student) }}">
                                 @csrf
-                                <button type="submit" class="btn btn-ghost btn-sm" @if ($info['cooldown'] > 0) data-countdown="{{ $info['cooldown'] }}" @endif><x-icon name="mail" :size="16" />reenviar</button>
+                                <button type="submit" class="btn btn-ghost btn-sm" @if ($info['cooldown'] > 0) data-countdown="{{ $info['cooldown'] }}" @endif><x-icon name="mail" :size="16" />{{ __('reenviar') }}</button>
                             </form>
-                            <a href="{{ route('admin.students.show', $student) }}" class="btn btn-ghost btn-icon" aria-label="Ver ficha de {{ $student->full_name }}"><x-icon name="eye" :size="16" /></a>
+                            <a href="{{ route('admin.students.show', $student) }}" class="btn btn-ghost btn-icon" aria-label="{{ __('Ver ficha de :name', ['name' => $student->full_name]) }}"><x-icon name="eye" :size="16" /></a>
                         </div>
                     </td>
                 </tr>
@@ -73,8 +73,8 @@
                 <tr>
                     <td colspan="5">
                         <div class="empty">
-                            <span class="empty__cmd">ls pendientes/ <span class="muted">— vacío</span></span>
-                            <span>No hay nadie esperando a activar su cuenta.</span>
+                            <span class="empty__cmd">ls {{ __('pendientes') }}/ <span class="muted">— {{ __('vacío') }}</span></span>
+                            <span>{{ __('No hay nadie esperando a activar su cuenta.') }}</span>
                         </div>
                     </td>
                 </tr>

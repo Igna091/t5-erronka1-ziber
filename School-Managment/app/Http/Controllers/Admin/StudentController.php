@@ -84,11 +84,11 @@ class StudentController extends Controller
             report($e);
 
             return $redirect
-                ->with('success', 'Alumno creado.')
-                ->with('error', 'No se pudo enviar el email de activación. Revisa la configuración del correo y usa «Reenviar email de activación».');
+                ->with('success', __('Alumno creado.'))
+                ->with('error', __('No se pudo enviar el email de activación. Revisa la configuración del correo y usa «Reenviar email de activación».'));
         }
 
-        return $redirect->with('success', "Alumno creado. Le hemos enviado un email a {$student->email} para activar su cuenta.");
+        return $redirect->with('success', __('Alumno creado. Le hemos enviado un email a :email para activar su cuenta.', ['email' => $student->email]));
     }
 
     /**
@@ -101,20 +101,20 @@ class StudentController extends Controller
         }
 
         if ($student->is_registered) {
-            return back()->with('error', 'Este alumno/a ya ha activado su cuenta.');
+            return back()->with('error', __('Este alumno/a ya ha activado su cuenta.'));
         }
 
         try {
             if (!$activation->send($student)) {
-                return back()->with('error', 'Ya se ha enviado un email hace menos de un minuto. Espera un poco antes de reenviarlo.');
+                return back()->with('error', __('Ya se ha enviado un email hace menos de un minuto. Espera un poco antes de reenviarlo.'));
             }
         } catch (TransportExceptionInterface $e) {
             report($e);
 
-            return back()->with('error', 'No se pudo enviar el email de activación. Revisa la configuración del correo.');
+            return back()->with('error', __('No se pudo enviar el email de activación. Revisa la configuración del correo.'));
         }
 
-        return back()->with('success', "Email de activación reenviado a {$student->email}. El enlace anterior ya no funciona.");
+        return back()->with('success', __('Email de activación reenviado a :email. El enlace anterior ya no funciona.', ['email' => $student->email]));
     }
 
     /**
@@ -158,7 +158,7 @@ class StudentController extends Controller
         $student->update($this->validateStudent($request, $student));
 
         $redirect = redirect()->route('admin.students.show', $student)
-            ->with('success', 'Datos del alumno/a actualizados correctamente.');
+            ->with('success', __('Datos del alumno/a actualizados correctamente.'));
 
         // Pending student with a corrected email: the old link went to the wrong address
         if (!$student->is_registered && $student->wasChanged('email')) {
@@ -167,10 +167,10 @@ class StudentController extends Controller
             } catch (TransportExceptionInterface $e) {
                 report($e);
 
-                return $redirect->with('error', 'No se pudo enviar el email de activación al nuevo email. Usa «Reenviar email de activación».');
+                return $redirect->with('error', __('No se pudo enviar el email de activación al nuevo email. Usa «Reenviar email de activación».'));
             }
 
-            return $redirect->with('success', "Datos actualizados. Hemos enviado un nuevo email de activación a {$student->email}.");
+            return $redirect->with('success', __('Datos actualizados. Hemos enviado un nuevo email de activación a :email.', ['email' => $student->email]));
         }
 
         return $redirect;
@@ -195,8 +195,8 @@ class StudentController extends Controller
             'dni' => ['required', 'string', 'max:20', Rule::unique('users', 'dni')->ignore($student)],
             'phone' => ['nullable', 'string', 'max:20'],
         ], [
-            'email.unique' => 'Ya existe un usuario con este email.',
-            'dni.unique' => 'Ya existe un usuario con este DNI.',
+            'email.unique' => __('Ya existe un usuario con este email.'),
+            'dni.unique' => __('Ya existe un usuario con este DNI.'),
         ]);
     }
 
@@ -220,6 +220,6 @@ class StudentController extends Controller
         });
 
         return redirect()->route('admin.students.index')
-            ->with('success', "Alumno/a {$name} eliminado/a correctamente.");
+            ->with('success', __('Alumno/a :name eliminado/a correctamente.', ['name' => $name]));
     }
 }

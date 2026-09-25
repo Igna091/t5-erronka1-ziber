@@ -12,9 +12,9 @@
         <span class="user-dropdown-btn__who">
             <span class="user-dropdown-btn__name">{{ $user->name }}</span>
             <span class="lbl">
-                @if ($user->isAdmin()) administrador
-                @elseif ($user->isTeacher()) profesor/a
-                @else estudiante
+                @if ($user->isAdmin()) {{ __('administrador') }}
+                @elseif ($user->isTeacher()) {{ __('profesor/a') }}
+                @else {{ __('estudiante') }}
                 @endif
             </span>
         </span>
@@ -29,15 +29,15 @@
         <div class="dropdown-divider"></div>
 
         @if ($user->isStudent())
-            <a href="{{ route('student.profile') }}" class="dropdown-item {{ request()->routeIs('student.profile') ? 'active' : '' }}" role="menuitem"><x-icon name="users" :size="16" />mi perfil</a>
-            <a href="{{ route('student.enrollments') }}" class="dropdown-item {{ request()->routeIs('student.enrollments') ? 'active' : '' }}" role="menuitem"><x-icon name="clipboard" :size="16" />mis matrículas</a>
+            <a href="{{ route('student.profile') }}" class="dropdown-item {{ request()->routeIs('student.profile') ? 'active' : '' }}" role="menuitem"><x-icon name="users" :size="16" />{{ __('mi perfil') }}</a>
+            <a href="{{ route('student.enrollments') }}" class="dropdown-item {{ request()->routeIs('student.enrollments') ? 'active' : '' }}" role="menuitem"><x-icon name="clipboard" :size="16" />{{ __('mis matrículas') }}</a>
         @endif
-        <a href="{{ route('settings.index') }}" class="dropdown-item {{ request()->routeIs('settings.index') ? 'active' : '' }}" role="menuitem"><x-icon name="settings" :size="16" />ajustes</a>
+        <a href="{{ route('settings.index') }}" class="dropdown-item {{ request()->routeIs('settings.index') ? 'active' : '' }}" role="menuitem"><x-icon name="settings" :size="16" />{{ __('ajustes') }}</a>
 
         <div class="dropdown-divider"></div>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button type="submit" class="dropdown-item dropdown-item--danger" role="menuitem"><x-icon name="logout" :size="16" />cerrar sesión</button>
+            <button type="submit" class="dropdown-item dropdown-item--danger" role="menuitem"><x-icon name="logout" :size="16" />{{ __('cerrar sesión') }}</button>
         </form>
     </div>
 </div>

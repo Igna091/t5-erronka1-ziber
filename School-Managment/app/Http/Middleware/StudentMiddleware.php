@@ -15,7 +15,7 @@ class StudentMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!$request->user() || !$request->user()->isStudent()) {
-            abort(403, 'Acceso denegado.');
+            abort(403, __('Acceso denegado.'));
         }
 
         return $next($request);

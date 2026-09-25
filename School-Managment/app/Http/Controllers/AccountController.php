@@ -29,9 +29,9 @@ class AccountController extends Controller
             'email' => ['required', 'email', 'max:255', Rule::notIn([$user->email]), Rule::unique('users', 'email')->ignore($user->id)],
             'current_password' => ['required', 'current_password'],
         ], [
-            'email.not_in' => 'Ese ya es tu email actual.',
-            'email.unique' => 'Ya existe una cuenta con ese email.',
-            'current_password.current_password' => 'La contraseña actual no es correcta.',
+            'email.not_in' => __('Ese ya es tu email actual.'),
+            'email.unique' => __('Ya existe una cuenta con ese email.'),
+            'current_password.current_password' => __('La contraseña actual no es correcta.'),
         ]);
 
         $oldEmail = $user->email;
@@ -41,7 +41,7 @@ class AccountController extends Controller
         $this->notify($oldEmail, new AccountChanged(AccountChanged::EMAIL, $user->name, $user->email));
 
         return redirect()->route('settings.index')
-            ->with('success', "Email actualizado. A partir de ahora inicia sesión con {$user->email}.");
+            ->with('success', __('Email actualizado. A partir de ahora inicia sesión con :email.', ['email' => $user->email]));
     }
 
     /**
@@ -55,9 +55,9 @@ class AccountController extends Controller
             'current_password' => ['required', 'current_password'],
             'password' => ['required', 'confirmed', 'different:current_password', Password::min(8)->letters()->numbers()],
         ], [
-            'current_password.current_password' => 'La contraseña actual no es correcta.',
-            'password.different' => 'La nueva contraseña tiene que ser distinta de la actual.',
-            'password.confirmed' => 'Las dos contraseñas nuevas no coinciden.',
+            'current_password.current_password' => __('La contraseña actual no es correcta.'),
+            'password.different' => __('La nueva contraseña tiene que ser distinta de la actual.'),
+            'password.confirmed' => __('Las dos contraseñas nuevas no coinciden.'),
         ]);
 
         $user->forceFill([
@@ -75,7 +75,7 @@ class AccountController extends Controller
         $this->notify($user->email, new AccountChanged(AccountChanged::PASSWORD, $user->name));
 
         return redirect()->route('settings.index')
-            ->with('success', 'Contraseña actualizada. Hemos cerrado tu sesión en los demás dispositivos.');
+            ->with('success', __('Contraseña actualizada. Hemos cerrado tu sesión en los demás dispositivos.'));
     }
 
     /**
@@ -84,7 +84,7 @@ class AccountController extends Controller
     private function notify(string $email, AccountChanged $notification): void
     {
         try {
-            Notification::route('mail', $email)->notify($notification->locale('es'));
+            Notification::route('mail', $email)->notify($notification); // in the current language
         } catch (TransportExceptionInterface $e) {
             report($e);
         }

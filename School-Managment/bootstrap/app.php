@@ -20,6 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\SecurityHeaders::class,
         ]);
+
+        // Language first, so every response (error pages included) is translated
+        $middleware->prepend(\App\Http\Middleware\SetLocale::class);
+        $middleware->encryptCookies(except: [\App\Http\Middleware\SetLocale::COOKIE]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

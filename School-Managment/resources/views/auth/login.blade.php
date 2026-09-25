@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Iniciar sesión - ZiberEibar')
+@section('title', __('Iniciar sesión - ZiberEibar'))
 
 @section('content')
 <section class="container auth">
@@ -11,15 +11,15 @@
     </svg>
 
     <div class="auth__copy">
-        <span class="kicker fx-fade">acceso // alumnado y administración</span>
+        <span class="kicker fx-fade">{{ __('acceso // alumnado y administración') }}</span>
         <h1 class="h-hero">
-            <span class="fx-type">Inicia</span>
-            <span class="fx-type acc" style="--d: 0.7s">sesión.<span class="cursor" aria-hidden="true"></span></span>
+            <span class="fx-type">{{ __('Inicia') }}</span>
+            <span class="fx-type acc" style="--d: 0.7s">{{ __('sesión.') }}<span class="cursor" aria-hidden="true"></span></span>
         </h1>
         <div class="auth__notes fx-fade" style="--d: 1.3s">
             <div><span class="prompt">$</span> ziber login</div>
-            <div>&gt; entra con el email con el que te dio de alta el centro</div>
-            <div>&gt; 5 intentos fallidos bloquean el acceso durante 1 minuto</div>
+            <div>&gt; {{ __('entra con el email con el que te dio de alta el centro') }}</div>
+            <div>&gt; {{ __('5 intentos fallidos bloquean el acceso durante 1 minuto') }}</div>
         </div>
     </div>
 
@@ -34,27 +34,27 @@
         <form method="POST" action="{{ route('login') }}" class="form">
             @csrf
             <div class="form-group">
-                <label for="email" class="form-label">email</label>
-                <input type="email" id="email" name="email" class="form-input {{ $errors->has('email') ? 'is-invalid' : '' }}" value="{{ old('email') }}" required autofocus autocomplete="email" placeholder="tu@email.com">
+                <label for="email" class="form-label">{{ __('email') }}</label>
+                <input type="email" id="email" name="email" class="form-input {{ $errors->has('email') ? 'is-invalid' : '' }}" value="{{ old('email') }}" required autofocus autocomplete="email" placeholder="{{ __('tu@email.com') }}">
             </div>
             <div class="form-group">
-                <label for="password" class="form-label">contraseña</label>
+                <label for="password" class="form-label">{{ __('contraseña') }}</label>
                 <div class="input-with-btn">
-                    <input type="password" id="password" name="password" class="form-input {{ $errors->has('email') ? 'is-invalid' : '' }}" required autocomplete="current-password" placeholder="tu contraseña">
-                    <button type="button" class="input-btn" data-toggle-password="password" aria-pressed="false" aria-label="Mostrar u ocultar la contraseña">mostrar</button>
+                    <input type="password" id="password" name="password" class="form-input {{ $errors->has('email') ? 'is-invalid' : '' }}" required autocomplete="current-password" placeholder="{{ __('tu contraseña') }}">
+                    <button type="button" class="input-btn" data-toggle-password="password" aria-pressed="false" aria-label="{{ __('Mostrar u ocultar la contraseña') }}">{{ __('mostrar') }}</button>
                 </div>
             </div>
             <label class="check">
                 <input type="checkbox" name="remember" value="1" {{ old('remember') ? 'checked' : '' }}>
-                mantener la sesión iniciada
+                {{ __('mantener la sesión iniciada') }}
             </label>
-            <button type="submit" class="btn btn-primary btn-block">Iniciar sesión</button>
+            <button type="submit" class="btn btn-primary btn-block">{{ __('Iniciar sesión') }}</button>
         </form>
 
         <div class="hr"></div>
         <div class="stack-sm small muted">
-            <span>¿Primera vez? Activa tu cuenta con el enlace que te enviamos por email.</span>
-            <a href="{{ route('register') }}" class="link-arrow">no me llegó el email de activación</a>
+            <span>{{ __('¿Primera vez? Activa tu cuenta con el enlace que te enviamos por email.') }}</span>
+            <a href="{{ route('register') }}" class="link-arrow">{{ __('no me llegó el email de activación') }}</a>
         </div>
     </div>
 </section>

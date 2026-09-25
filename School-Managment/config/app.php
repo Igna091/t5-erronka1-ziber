@@ -78,9 +78,18 @@ return [
     |
     */
 
-    'locale' => env('APP_LOCALE', 'en'),
+    'locale' => env('APP_LOCALE', 'es'),
 
+    // Texts are written in Spanish (they are the translation keys in lang/*.json);
+    // English is only the fallback for Laravel's own messages (validation rules...)
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+
+    // Languages the visitor can choose in /ajustes (code => name in that language)
+    'available_locales' => [
+        'es' => 'Español',
+        'eu' => 'Euskara',
+        'en' => 'English',
+    ],
 
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
