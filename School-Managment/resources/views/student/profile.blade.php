@@ -20,7 +20,7 @@
                 <div><dt class="lbl">teléfono</dt><dd>{{ $user->phone ?? '—' }}</dd></div>
             </dl>
         </div>
-        <p class="small muted">Para cambiar tus datos personales, contacta con administración.</p>
+        <p class="small muted">Puedes cambiar tu email y tu contraseña en <a href="{{ route('settings.index') }}#seccion-cuenta">ajustes</a>. Para cambiar el resto de tus datos personales, contacta con administración.</p>
     </div>
 
     <aside class="panel panel__pad fx-fade" style="--d: 0.2s" aria-label="Resumen">

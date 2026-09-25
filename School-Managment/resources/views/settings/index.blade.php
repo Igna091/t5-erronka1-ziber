@@ -15,7 +15,7 @@
             <div class="settings-title-row">
                 <div>
                     <h1 class="settings-title">Ajustes de la plataforma</h1>
-                    <p class="settings-subtitle">Gestiona tus preferencias de apariencia, tamaño de texto e idioma de navegación.</p>
+                    <p class="settings-subtitle">@auth Gestiona tu cuenta y tus preferencias de apariencia, tamaño de texto e idioma de navegación. @else Gestiona tus preferencias de apariencia, tamaño de texto e idioma de navegación. @endauth</p>
                 </div>
                 @auth
                     <div class="user-badge-pill">
@@ -46,6 +46,91 @@
         </div>
 
         <div class="settings-grid">
+            @auth
+                {{-- Account & security: login email and password (AccountController) --}}
+                <section class="card settings-card" id="seccion-cuenta">
+                    <div class="settings-card-header">
+                        <div class="settings-card-icon"><x-icon name="lock" :size="22" /></div>
+                        <div>
+                            <h2>Cuenta y seguridad</h2>
+                            <p>Cambia el email con el que inicias sesión y tu contraseña. Para confirmar cualquier cambio te pediremos tu contraseña actual.</p>
+                        </div>
+                    </div>
+                    <div class="settings-card-body">
+                        <div class="setting-item">
+                            <div class="setting-item-label">
+                                <h3>Email de acceso</h3>
+                                <p>Ahora es <strong>{{ auth()->user()->email }}</strong>. Te enviaremos un aviso a este email si se cambia.</p>
+                            </div>
+                            <form method="POST" action="{{ route('settings.email') }}" class="form">
+                                @csrf
+                                @method('PUT')
+                                <div class="form-group">
+                                    <label for="new_email" class="form-label">nuevo email</label>
+                                    <input type="email" id="new_email" name="email" class="form-input @error('email', 'emailUpdate') is-invalid @enderror" value="{{ old('email') }}" required maxlength="255" autocomplete="email" placeholder="tu@email.com">
+                                    @error('email', 'emailUpdate')<span class="form-error">{{ $message }}</span>@enderror
+                                </div>
+                                <div class="form-group">
+                                    <label for="email_current_password" class="form-label">contraseña actual</label>
+                                    <div class="input-with-btn">
+                                        <input type="password" id="email_current_password" name="current_password" class="form-input @error('current_password', 'emailUpdate') is-invalid @enderror" required autocomplete="current-password" placeholder="para confirmar el cambio">
+                                        <button type="button" class="input-btn" data-toggle-password="email_current_password" aria-pressed="false" aria-label="Mostrar u ocultar la contraseña">mostrar</button>
+                                    </div>
+                                    @error('current_password', 'emailUpdate')<span class="form-error">{{ $message }}</span>@enderror
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary btn-sm">Cambiar email</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="setting-divider"></div>
+
+                        <div class="setting-item">
+                            <div class="setting-item-label">
+                                <h3>Contraseña</h3>
+                                <p>Al cambiarla cerraremos tu sesión en los demás dispositivos y te avisaremos por email.</p>
+                            </div>
+                            <form method="POST" action="{{ route('settings.password') }}" class="form">
+                                @csrf
+                                @method('PUT')
+                                {{-- Lets password managers know which account this is --}}
+                                <input type="email" class="sr-only" value="{{ auth()->user()->email }}" autocomplete="username" tabindex="-1" aria-hidden="true" readonly>
+                                <div class="form-group">
+                                    <label for="current_password" class="form-label">contraseña actual</label>
+                                    <div class="input-with-btn">
+                                        <input type="password" id="current_password" name="current_password" class="form-input @error('current_password', 'passwordUpdate') is-invalid @enderror" required autocomplete="current-password" placeholder="tu contraseña actual">
+                                        <button type="button" class="input-btn" data-toggle-password="current_password" aria-pressed="false" aria-label="Mostrar u ocultar la contraseña actual">mostrar</button>
+                                    </div>
+                                    @error('current_password', 'passwordUpdate')<span class="form-error">{{ $message }}</span>@enderror
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="new_password" class="form-label">nueva contraseña</label>
+                                        <input type="password" id="new_password" name="password" class="form-input @error('password', 'passwordUpdate') is-invalid @enderror" required autocomplete="new-password" placeholder="mínimo 8 caracteres" aria-describedby="account-password-rules" data-password>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="new_password_confirmation" class="form-label">repite la nueva contraseña</label>
+                                        <input type="password" id="new_password_confirmation" name="password_confirmation" class="form-input" required autocomplete="new-password" placeholder="la misma contraseña" data-password-confirm>
+                                    </div>
+                                </div>
+                                @error('password', 'passwordUpdate')<span class="form-error">{{ $message }}</span>@enderror
+                                <div class="rules" id="account-password-rules" data-password-rules aria-live="polite">
+                                    <div class="rules__head"><span class="lbl">requisitos</span><span class="ascii muted" data-rules-meter>[----------]</span></div>
+                                    <span class="rule" data-rule="length">8 caracteres o más</span>
+                                    <span class="rule" data-rule="letters">contiene letras</span>
+                                    <span class="rule" data-rule="numbers">contiene números</span>
+                                    <span class="rule" data-rule="match">las dos contraseñas coinciden</span>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary btn-sm">Cambiar contraseña</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            @endauth
+
             {{-- Section 1: Apariencia & Visualización --}}
             <section class="card settings-card" id="seccion-apariencia">
                 <div class="settings-card-header">

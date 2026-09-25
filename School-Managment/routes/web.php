@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EnrollmentController;
 use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\HomeController;
@@ -68,6 +69,12 @@ Route::middleware(['auth', 'student'])->group(function () {
 */
 
 Route::view('/ajustes', 'settings.index')->name('settings.index');
+
+// Account of the logged-in user (both ask for the current password; the throttle stops guessing it)
+Route::middleware(['auth', 'throttle:6,1'])->group(function () {
+    Route::put('/ajustes/email', [AccountController::class, 'updateEmail'])->name('settings.email');
+    Route::put('/ajustes/contrasena', [AccountController::class, 'updatePassword'])->name('settings.password');
+});
 
 /*
 |--------------------------------------------------------------------------
