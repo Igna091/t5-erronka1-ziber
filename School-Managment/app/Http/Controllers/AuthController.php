@@ -18,6 +18,8 @@ class AuthController extends Controller
 
     public const INVALID_LINK_MESSAGE = 'El enlace de activación no es válido o ha caducado. Solicita uno nuevo.';
 
+    public const PUBLIC_RESENDS_PER_DAY = 5;
+
     /**
      * Show the login form.
      */
@@ -92,14 +94,22 @@ class AuthController extends Controller
             'email' => ['required', 'email', 'max:255'],
         ]);
 
-        if ($student = $activation->pendingStudent($validated['email'])) {
+        // Max emails a day per student from this public page: stops email bombing and
+        // running out of the mail provider's daily quota. The admin can still resend.
+        $dailyKey = 'activation-resend:'.strtolower($validated['email']);
+
+        if (($student = $activation->pendingStudent($validated['email']))
+            && !RateLimiter::tooManyAttempts($dailyKey, self::PUBLIC_RESENDS_PER_DAY)) {
             try {
-                $activation->send($student);
+                if ($activation->send($student)) {
+                    RateLimiter::hit($dailyKey, 60 * 60 * 24);
+                }
             } catch (TransportExceptionInterface $e) {
                 report($e);
             }
         }
 
+        // Same answer in every case, so it doesn't reveal which emails exist
         return back()->with('success', self::ACTIVATION_SENT_MESSAGE);
     }
 

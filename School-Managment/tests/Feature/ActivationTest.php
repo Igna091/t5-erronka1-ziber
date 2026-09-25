@@ -192,6 +192,30 @@ class ActivationTest extends TestCase
         Notification::assertSentToTimes($student, ActivateAccount::class, 2);
     }
 
+    public function test_public_resend_is_capped_per_day_but_admin_can_still_resend(): void
+    {
+        Notification::fake();
+        $student = $this->pendingStudent();
+
+        // One request a minute (the per-minute limits pass) for 6 minutes
+        for ($i = 0; $i < AuthController::PUBLIC_RESENDS_PER_DAY + 1; $i++) {
+            $this->post('/register', ['email' => 'ana@educenter.es'])
+                ->assertSessionHas('success', AuthController::ACTIVATION_SENT_MESSAGE);
+            $this->travel(61)->seconds();
+        }
+        Notification::assertSentToTimes($student, ActivateAccount::class, AuthController::PUBLIC_RESENDS_PER_DAY);
+
+        // The admin isn't affected by the public cap
+        $this->actingAs($this->admin())->post(route('admin.students.resend-activation', $student));
+        Notification::assertSentToTimes($student, ActivateAccount::class, AuthController::PUBLIC_RESENDS_PER_DAY + 1);
+        $this->post('/logout');
+
+        // A day later the student can ask again
+        $this->travel(1)->days();
+        $this->post('/register', ['email' => 'ana@educenter.es']);
+        Notification::assertSentToTimes($student, ActivateAccount::class, AuthController::PUBLIC_RESENDS_PER_DAY + 2);
+    }
+
     // --- Admin -------------------------------------------------------------------------
 
     public function test_admin_can_resend_activation_email(): void
