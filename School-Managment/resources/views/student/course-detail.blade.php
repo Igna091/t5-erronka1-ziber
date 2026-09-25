@@ -16,7 +16,7 @@
 <div class="crumbs">
     <a href="{{ route('courses.index') }}"><x-icon name="arrow-left" :size="16" />volver a cursos</a>
     <span class="crumbs__sep" aria-hidden="true">/</span>
-    <span>~/cursos/<span class="crumbs__here">{{ $course->slug }}</span></span>
+    <span>cursos <span class="crumbs__sep">/</span> <span class="crumbs__here">{{ $course->slug }}</span></span>
 </div>
 
 <section class="container detail">

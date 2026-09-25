@@ -6,7 +6,7 @@
 <section class="container page-top">
     <div class="section-head">
         <div class="section-head__title">
-            <span class="kicker fx-fade">~/información</span>
+            <span class="kicker fx-fade">// información</span>
             <h1 class="h-page"><span class="fx-type">Sobre</span><span class="fx-type acc" style="--d: 0.6s">ZiberEibar.<span class="cursor" aria-hidden="true"></span></span></h1>
         </div>
         <div class="stack fx-fade" style="--d: 1s; max-width: 34rem;">

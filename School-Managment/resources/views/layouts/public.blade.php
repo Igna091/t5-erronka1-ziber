@@ -24,20 +24,20 @@
 
                 <nav aria-label="Principal">
                     <div class="navbar-links" id="navbarLinks">
-                        <a href="{{ route('home') }}" @if(request()->routeIs('home')) aria-current="page" @endif>~/inicio</a>
-                        <a href="{{ route('courses.index') }}" @if(request()->routeIs('courses.*')) aria-current="page" @endif>~/cursos</a>
-                        <a href="{{ route('about') }}" @if(request()->routeIs('about')) aria-current="page" @endif>~/información</a>
+                        <a href="{{ route('home') }}" @if(request()->routeIs('home')) aria-current="page" @endif><x-icon name="home" :size="16" />inicio</a>
+                        <a href="{{ route('courses.index') }}" @if(request()->routeIs('courses.*')) aria-current="page" @endif><x-icon name="book" :size="16" />cursos</a>
+                        <a href="{{ route('about') }}" @if(request()->routeIs('about')) aria-current="page" @endif><x-icon name="info" :size="16" />información</a>
                         @auth
                             @if(auth()->user()->isStudent())
-                                <a href="{{ route('student.enrollments') }}" @if(request()->routeIs('student.enrollments')) aria-current="page" @endif>~/mis-matrículas</a>
+                                <a href="{{ route('student.enrollments') }}" @if(request()->routeIs('student.enrollments')) aria-current="page" @endif><x-icon name="clipboard" :size="16" />mis matrículas</a>
                             @endif
                             @if(auth()->user()->isAdmin())
-                                <a href="{{ route('admin.dashboard') }}">~/admin</a>
+                                <a href="{{ route('admin.dashboard') }}"><x-icon name="dashboard" :size="16" />administración</a>
                             @endif
                         @else
-                            <a href="{{ route('login') }}" class="mobile-only">~/iniciar-sesión</a>
-                            <a href="{{ route('register') }}" class="mobile-only">~/activar-cuenta</a>
-                            <a href="{{ route('settings.index') }}" class="mobile-only">~/ajustes</a>
+                            <a href="{{ route('login') }}" class="mobile-only"><x-icon name="login" :size="16" />iniciar sesión</a>
+                            <a href="{{ route('register') }}" class="mobile-only"><x-icon name="mail" :size="16" />activar cuenta</a>
+                            <a href="{{ route('settings.index') }}" class="mobile-only"><x-icon name="settings" :size="16" />ajustes</a>
                         @endauth
                     </div>
                 </nav>
@@ -99,9 +99,9 @@
                 </div>
                 <div class="footer__col">
                     <span class="lbl">navegación</span>
-                    <a href="{{ route('courses.index') }}">~/cursos</a>
-                    <a href="{{ route('about') }}">~/información</a>
-                    <a href="{{ route('settings.index') }}">~/ajustes</a>
+                    <a href="{{ route('courses.index') }}">cursos</a>
+                    <a href="{{ route('about') }}">información</a>
+                    <a href="{{ route('settings.index') }}">ajustes</a>
                 </div>
                 <span>&copy; {{ date('Y') }} ZiberEibar</span>
             </div>

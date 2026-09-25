@@ -6,7 +6,7 @@
 <section class="container page-top">
     <div class="section-head">
         <div class="section-head__title">
-            <span class="kicker fx-fade">~/cursos</span>
+            <span class="kicker fx-fade">// cursos</span>
             <h1 class="h-page"><span class="fx-type">Cursos abiertos.</span></h1>
         </div>
         <p class="fx-fade" style="--d: 0.6s">{{ $courses->count() }} {{ $courses->count() === 1 ? 'curso disponible' : 'cursos disponibles' }}. Para matricularte necesitas tu cuenta de alumno activada.</p>
