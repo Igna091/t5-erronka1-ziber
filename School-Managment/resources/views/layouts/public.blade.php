@@ -103,7 +103,12 @@
                     <a href="{{ route('about') }}">información</a>
                     <a href="{{ route('settings.index') }}">ajustes</a>
                 </div>
-                <span>&copy; {{ date('Y') }} ZiberEibar</span>
+                <div class="footer__col">
+                    <span class="lbl">legal</span>
+                    <a href="{{ route('legal.privacy') }}">privacidad</a>
+                    <a href="{{ route('legal.terms') }}">términos</a>
+                    <span>&copy; {{ date('Y') }} ZiberEibar</span>
+                </div>
             </div>
         </footer>
     </div>

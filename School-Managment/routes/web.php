@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/informacion', [HomeController::class, 'about'])->name('about');
+Route::view('/privacidad', 'legal.privacy')->name('legal.privacy');
+Route::view('/terminos', 'legal.terms')->name('legal.terms');
 
 /*
 |--------------------------------------------------------------------------

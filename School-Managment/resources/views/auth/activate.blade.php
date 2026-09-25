@@ -54,6 +54,13 @@
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">Activar cuenta</button>
+
+            {{-- New tab so the student doesn't lose what they typed --}}
+            <p class="legal-note">
+                Al activar tu cuenta aceptas nuestra
+                <a href="{{ route('legal.privacy') }}" target="_blank" rel="noopener">política de privacidad</a>
+                y los <a href="{{ route('legal.terms') }}" target="_blank" rel="noopener">términos y condiciones</a> del servicio.
+            </p>
         </form>
     </div>
 </section>

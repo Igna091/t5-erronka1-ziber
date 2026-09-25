@@ -622,6 +622,18 @@ a.enrol-card:hover { border-color: var(--acc); color: var(--text); transform: tr
 .stack { display: flex; flex-direction: column; gap: 1rem; }
 .stack-sm { display: flex; flex-direction: column; gap: 0.625rem; }
 
+/* Legal note under forms + legal pages */
+.legal-note { font-size: 0.75rem; line-height: 1.6; color: var(--muted); text-align: center; text-wrap: pretty; }
+.legal-note a { color: var(--text-2); }
+.legal-note a:hover { color: var(--acc); }
+.legal { max-width: 48rem; display: flex; flex-direction: column; gap: 1rem; }
+.legal h2 { margin-top: 1.5rem; font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; text-transform: uppercase; }
+.legal p { color: var(--text-2); line-height: 1.8; }
+.legal ul { display: flex; flex-direction: column; gap: 0.5rem; }
+.legal li { display: flex; gap: 0.75rem; color: var(--text-2); line-height: 1.7; }
+.legal li::before { content: "›"; color: var(--acc); flex-shrink: 0; }
+.ph { padding: 0 0.25rem; background: var(--warn-soft); color: var(--warn); }
+
 /* About page */
 .values { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
 .value { padding: 1.75rem; display: flex; flex-direction: column; gap: 0.875rem; }
