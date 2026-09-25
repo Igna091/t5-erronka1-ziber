@@ -37,22 +37,22 @@ class AccountChanged extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $when = now()->format('d/m/Y \a \l\a\s H:i');
-        $mail = (new MailMessage)->greeting("¡Hola, {$this->name}!");
+        $when = ['date' => now()->format('d/m/Y'), 'time' => now()->format('H:i')];
+        $mail = (new MailMessage)->greeting(__('¡Hola, :name!', ['name' => $this->name]));
 
         if ($this->change === self::PASSWORD) {
-            $mail->subject('Tu contraseña de ZiberEibar ha cambiado')
-                ->line("La contraseña de tu cuenta se cambió el {$when}.")
-                ->line('Por seguridad, hemos cerrado tu sesión en los demás dispositivos.');
+            $mail->subject(__('Tu contraseña de ZiberEibar ha cambiado'))
+                ->line(__('La contraseña de tu cuenta se cambió el :date a las :time.', $when))
+                ->line(__('Por seguridad, hemos cerrado tu sesión en los demás dispositivos.'));
         } else {
-            $mail->subject('El email de tu cuenta de ZiberEibar ha cambiado')
-                ->line("El email con el que inicias sesión se cambió el {$when}.")
-                ->line('Ahora es: '.self::mask((string) $this->newEmail));
+            $mail->subject(__('El email de tu cuenta de ZiberEibar ha cambiado'))
+                ->line(__('El email con el que inicias sesión se cambió el :date a las :time.', $when))
+                ->line(__('Ahora es: :email', ['email' => self::mask((string) $this->newEmail)]));
         }
 
         return $mail
-            ->line('Si no has sido tú, contacta con el centro cuanto antes en info@zibereibar.eus.')
-            ->salutation('Un saludo, el equipo de ZiberEibar');
+            ->line(__('Si no has sido tú, contacta con el centro cuanto antes en :email.', ['email' => 'info@zibereibar.eus']))
+            ->salutation(__('Un saludo, el equipo de ZiberEibar'));
     }
 
     /**

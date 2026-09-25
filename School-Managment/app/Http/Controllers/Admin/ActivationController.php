@@ -33,7 +33,7 @@ class ActivationController extends Controller
         $students = User::students()->where('is_registered', false)->get();
 
         if ($students->isEmpty()) {
-            return back()->with('success', 'No hay alumnos pendientes de activar su cuenta.');
+            return back()->with('success', __('No hay alumnos pendientes de activar su cuenta.'));
         }
 
         $sent = 0;
@@ -46,15 +46,15 @@ class ActivationController extends Controller
                 report($e);
 
                 // The mail server is failing: stop instead of waiting for each student
-                return back()->with('error', "No se pudo enviar el email a {$student->email}. Revisa la configuración del correo.".($sent ? " Antes del error se enviaron {$sent}." : ''));
+                $message = __('No se pudo enviar el email a :email. Revisa la configuración del correo.', ['email' => $student->email]);
+
+                return back()->with('error', $sent ? $message.' '.__('Antes del error se enviaron :count.', ['count' => $sent]) : $message);
             }
         }
 
-        $message = $sent === 1 ? 'Enviado 1 email de activación.' : "Enviados {$sent} emails de activación.";
+        $message = trans_choice('Enviado :count email de activación.|Enviados :count emails de activación.', $sent);
         if ($skipped) {
-            $message .= $skipped === 1
-                ? ' 1 alumno omitido: se le envió uno hace menos de un minuto.'
-                : " {$skipped} alumnos omitidos: se les envió uno hace menos de un minuto.";
+            $message .= ' '.trans_choice(':count alumno omitido: se le envió uno hace menos de un minuto.|:count alumnos omitidos: se les envió uno hace menos de un minuto.', $skipped);
         }
 
         return back()->with('success', $message);

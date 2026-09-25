@@ -45,7 +45,7 @@ class AuthController extends Controller
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             throw ValidationException::withMessages([
-                'email' => 'Demasiados intentos. Inténtalo de nuevo en '.RateLimiter::availableIn($throttleKey).' segundos.',
+                'email' => __('Demasiados intentos. Inténtalo de nuevo en :seconds segundos.', ['seconds' => RateLimiter::availableIn($throttleKey)]),
             ]);
         }
 
@@ -59,7 +59,7 @@ class AuthController extends Controller
             RateLimiter::hit($throttleKey, 60);
 
             return back()->withErrors([
-                'email' => 'Las credenciales no son correctas o la cuenta aún no está activada.',
+                'email' => __('Las credenciales no son correctas o la cuenta aún no está activada.'),
             ])->onlyInput('email', 'remember');
         }
 
@@ -110,7 +110,7 @@ class AuthController extends Controller
         }
 
         // Same answer in every case, so it doesn't reveal which emails exist
-        return back()->with('success', self::ACTIVATION_SENT_MESSAGE);
+        return back()->with('success', __(self::ACTIVATION_SENT_MESSAGE));
     }
 
     /**
@@ -122,7 +122,7 @@ class AuthController extends Controller
         $student = $activation->pendingStudent($email);
 
         if (!$student || !$activation->isValid($student, $token)) {
-            return redirect()->route('register')->with('error', self::INVALID_LINK_MESSAGE);
+            return redirect()->route('register')->with('error', __(self::INVALID_LINK_MESSAGE));
         }
 
         return view('auth.activate', ['token' => $token, 'email' => $student->email, 'student' => $student]);
@@ -142,7 +142,7 @@ class AuthController extends Controller
         $student = $activation->pendingStudent($validated['email']);
 
         if (!$student || !$activation->isValid($student, $validated['token'])) {
-            return back()->withErrors(['email' => self::INVALID_LINK_MESSAGE]);
+            return back()->withErrors(['email' => __(self::INVALID_LINK_MESSAGE)]);
         }
 
         $activation->activate($student, $validated['password']);
@@ -151,7 +151,7 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         return redirect()->route('courses.index')
-            ->with('success', 'Cuenta activada correctamente. ¡Bienvenido/a!');
+            ->with('success', __('Cuenta activada correctamente. ¡Bienvenido/a!'));
     }
 
     /**

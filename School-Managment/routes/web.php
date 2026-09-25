@@ -9,6 +9,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -69,6 +70,7 @@ Route::middleware(['auth', 'student'])->group(function () {
 */
 
 Route::view('/ajustes', 'settings.index')->name('settings.index');
+Route::post('/ajustes/idioma', [LocaleController::class, 'update'])->name('settings.locale');
 
 // Account of the logged-in user (both ask for the current password; the throttle stops guessing it)
 Route::middleware(['auth', 'throttle:6,1'])->group(function () {

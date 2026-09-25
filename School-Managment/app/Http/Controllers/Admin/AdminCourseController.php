@@ -58,7 +58,7 @@ class AdminCourseController extends Controller
         $course = Course::create($this->validateCourse($request));
 
         return redirect()->route('admin.courses.show', $course)
-            ->with('success', "Curso «{$course->name}» creado correctamente.");
+            ->with('success', __('Curso «:course» creado correctamente.', ['course' => $course->name]));
     }
 
     /**
@@ -90,7 +90,7 @@ class AdminCourseController extends Controller
         $course->update($this->validateCourse($request, $course));
 
         return redirect()->route('admin.courses.show', $course)
-            ->with('success', "Curso «{$course->name}» actualizado correctamente.");
+            ->with('success', __('Curso «:course» actualizado correctamente.', ['course' => $course->name]));
     }
 
     /**
@@ -121,12 +121,12 @@ class AdminCourseController extends Controller
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             'status' => ['required', Rule::in(['active', 'inactive'])],
         ], [
-            'name.unique' => 'Ya existe un curso con este nombre en el mismo año académico.',
-            'code.unique' => 'Ya existe un curso con este código.',
+            'name.unique' => __('Ya existe un curso con este nombre en el mismo año académico.'),
+            'code.unique' => __('Ya existe un curso con este código.'),
             'capacity.min' => $activeEnrollments > 1
-                ? "La capacidad no puede ser menor que las {$activeEnrollments} matrículas activas."
-                : 'La capacidad debe ser al menos 1.',
-            'end_date.after_or_equal' => 'La fecha de fin no puede ser anterior a la de inicio.',
+                ? __('La capacidad no puede ser menor que las :count matrículas activas.', ['count' => $activeEnrollments])
+                : __('La capacidad debe ser al menos 1.'),
+            'end_date.after_or_equal' => __('La fecha de fin no puede ser anterior a la de inicio.'),
         ]);
 
         return [...$validated, 'academic_year' => $academicYear];
@@ -157,13 +157,13 @@ class AdminCourseController extends Controller
         // Deleting would also delete the students' enrollments and grades
         if ($activeEnrollments > 0) {
             return redirect()->route('admin.courses.index')
-                ->with('error', "No se puede eliminar «{$course->name}»: tiene {$activeEnrollments} matrícula(s) activa(s). Cancélalas o marca el curso como inactivo.");
+                ->with('error', __('No se puede eliminar «:course»: tiene :count matrícula(s) activa(s). Cancélalas o marca el curso como inactivo.', ['course' => $course->name, 'count' => $activeEnrollments]));
         }
 
         // Cancelled enrollments, course subjects and grades are removed by the cascading foreign keys
         $course->delete();
 
         return redirect()->route('admin.courses.index')
-            ->with('success', "Curso «{$course->name}» eliminado correctamente.");
+            ->with('success', __('Curso «:course» eliminado correctamente.', ['course' => $course->name]));
     }
 }

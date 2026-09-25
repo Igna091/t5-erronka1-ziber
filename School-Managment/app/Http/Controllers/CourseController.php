@@ -70,7 +70,7 @@ class CourseController extends Controller
         }
 
         return redirect()->route('student.enrollments')
-            ->with('success', "Te has matriculado en «{$course->name}» correctamente.");
+            ->with('success', __('Te has matriculado en «:course» correctamente.', ['course' => $course->name]));
     }
 
     /**

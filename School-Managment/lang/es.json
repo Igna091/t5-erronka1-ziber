@@ -1,4 +1,21 @@
 {
     "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "Si el botón \":actionText\" no funciona, copia y pega este enlace en tu navegador:",
-    "All rights reserved.": "Todos los derechos reservados."
+    "All rights reserved.": "Todos los derechos reservados.",
+    "Enviado :count email de activación.|Enviados :count emails de activación.": "Enviado :count email de activación.|Enviados :count emails de activación.",
+    ":count alumno omitido: se le envió uno hace menos de un minuto.|:count alumnos omitidos: se les envió uno hace menos de un minuto.": ":count alumno omitido: se le envió uno hace menos de un minuto.|:count alumnos omitidos: se les envió uno hace menos de un minuto.",
+    "activado|activados": "activado|activados",
+    "pendiente|pendientes": "pendiente|pendientes",
+    "activo|activos": "activo|activos",
+    "inactivo|inactivos": "inactivo|inactivos",
+    "cancelada|canceladas": "cancelada|canceladas",
+    ":count matrícula|:count matrículas": ":count matrícula|:count matrículas",
+    ":count alumno no ha activado su cuenta.|:count alumnos no han activado su cuenta.": ":count alumno no ha activado su cuenta.|:count alumnos no han activado su cuenta.",
+    "¿Enviar un nuevo email de activación al alumno pendiente? Su enlace anterior dejará de funcionar.|¿Enviar un nuevo email de activación a los :count alumnos pendientes? Sus enlaces anteriores dejarán de funcionar.": "¿Enviar un nuevo email de activación al alumno pendiente? Su enlace anterior dejará de funcionar.|¿Enviar un nuevo email de activación a los :count alumnos pendientes? Sus enlaces anteriores dejarán de funcionar.",
+    ":count curso|:count cursos": ":count curso|:count cursos",
+    ":count alumno|:count alumnos": ":count alumno|:count alumnos",
+    ":count curso abierto. La lista completa está más abajo.|:count cursos abiertos. La lista completa está más abajo.": ":count curso abierto. La lista completa está más abajo.|:count cursos abiertos. La lista completa está más abajo.",
+    ":count curso disponible.|:count cursos disponibles.": ":count curso disponible.|:count cursos disponibles.",
+    ":count asignatura|:count asignaturas": ":count asignatura|:count asignaturas",
+    "curso matriculado|cursos matriculados": "curso matriculado|cursos matriculados",
+    ":count activa|:count activas": ":count activa|:count activas"
 }

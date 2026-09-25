@@ -18,7 +18,7 @@ class EnrollmentService
     public function enroll(User $student, Course $course): Enrollment
     {
         if (!$student->isStudent()) {
-            throw new EnrollmentException('Solo se puede matricular a alumnos.');
+            throw new EnrollmentException(__('Solo se puede matricular a alumnos.'));
         }
 
         return DB::transaction(function () use ($student, $course) {
@@ -26,11 +26,11 @@ class EnrollmentService
             $course = Course::whereKey($course->id)->lockForUpdate()->firstOrFail();
 
             if (!$course->isActive()) {
-                throw new EnrollmentException('Este curso no está disponible para matrícula.');
+                throw new EnrollmentException(__('Este curso no está disponible para matrícula.'));
             }
 
             if ($course->end_date && $course->end_date->lt(today())) {
-                throw new EnrollmentException('Este curso ya ha finalizado.');
+                throw new EnrollmentException(__('Este curso ya ha finalizado.'));
             }
 
             $enrollment = Enrollment::where('student_id', $student->id)
@@ -38,11 +38,11 @@ class EnrollmentService
                 ->first();
 
             if ($enrollment?->status === 'active') {
-                throw new EnrollmentException('Ya existe una matrícula activa en este curso.');
+                throw new EnrollmentException(__('Ya existe una matrícula activa en este curso.'));
             }
 
             if (!$course->hasAvailableSpots()) {
-                throw new EnrollmentException('No quedan plazas disponibles en este curso.');
+                throw new EnrollmentException(__('No quedan plazas disponibles en este curso.'));
             }
 
             // A cancelled enrollment is reactivated (student + course is unique)
@@ -69,7 +69,7 @@ class EnrollmentService
     public function cancel(Enrollment $enrollment): Enrollment
     {
         if ($enrollment->status !== 'active') {
-            throw new EnrollmentException('Esta matrícula ya está cancelada.');
+            throw new EnrollmentException(__('Esta matrícula ya está cancelada.'));
         }
 
         $enrollment->update(['status' => 'cancelled']);
@@ -86,7 +86,7 @@ class EnrollmentService
     public function reactivate(Enrollment $enrollment): Enrollment
     {
         if ($enrollment->status === 'active') {
-            throw new EnrollmentException('Esta matrícula ya está activa.');
+            throw new EnrollmentException(__('Esta matrícula ya está activa.'));
         }
 
         return $this->enroll($enrollment->student, $enrollment->course);

@@ -82,10 +82,10 @@ class EnrollmentController extends Controller
             ],
             'course_id' => ['required', 'integer', 'exists:courses,id'],
         ], [
-            'student_id.required' => 'Selecciona un alumno/a.',
-            'student_id.exists' => 'El alumno/a seleccionado no existe.',
-            'course_id.required' => 'Selecciona un curso.',
-            'course_id.exists' => 'El curso seleccionado no existe.',
+            'student_id.required' => __('Selecciona un alumno/a.'),
+            'student_id.exists' => __('El alumno/a seleccionado no existe.'),
+            'course_id.required' => __('Selecciona un curso.'),
+            'course_id.exists' => __('El curso seleccionado no existe.'),
         ]);
 
         $student = User::findOrFail($validated['student_id']);
@@ -98,7 +98,7 @@ class EnrollmentController extends Controller
         }
 
         return redirect()->route('admin.enrollments.index')
-            ->with('success', "{$student->full_name} matriculado/a en «{$course->name}» correctamente.");
+            ->with('success', __(':name matriculado/a en «:course» correctamente.', ['name' => $student->full_name, 'course' => $course->name]));
     }
 
     /**
@@ -112,7 +112,7 @@ class EnrollmentController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return back()->with('success', "Matrícula de {$enrollment->student->full_name} en «{$enrollment->course->name}» cancelada.");
+        return back()->with('success', __('Matrícula de :name en «:course» cancelada.', ['name' => $enrollment->student->full_name, 'course' => $enrollment->course->name]));
     }
 
     /**
@@ -126,6 +126,6 @@ class EnrollmentController extends Controller
             return back()->with('error', $e->getMessage());
         }
 
-        return back()->with('success', "Matrícula de {$enrollment->student->full_name} en «{$enrollment->course->name}» reactivada.");
+        return back()->with('success', __('Matrícula de :name en «:course» reactivada.', ['name' => $enrollment->student->full_name, 'course' => $enrollment->course->name]));
     }
 }

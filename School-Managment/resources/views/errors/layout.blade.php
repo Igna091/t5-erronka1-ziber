@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +12,7 @@
 <body>
     <main class="error-page">
         <div class="error-page__box">
-            <a href="{{ url('/') }}" class="brand" aria-label="ZiberEibar, ir al inicio">
+            <a href="{{ url('/') }}" class="brand" aria-label="{{ __('ZiberEibar, ir al inicio') }}">
                 <img src="{{ asset('images/logo-oscuro.png') }}" alt="" class="logo-on-dark">
                 <img src="{{ asset('images/logo-claro.png') }}" alt="" class="logo-on-light">
                 <span>ziber_eibar</span>
@@ -26,7 +26,7 @@
                 </div>
             </div>
             <div class="form-actions fx-fade" style="--d: 0.9s">
-                <a href="{{ url('/') }}" class="btn btn-primary">Ir al inicio</a>
+                <a href="{{ url('/') }}" class="btn btn-primary">{{ __('Ir al inicio') }}</a>
                 @yield('actions')
             </div>
         </div>

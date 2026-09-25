@@ -1,39 +1,39 @@
 @extends('layouts.admin')
 
-@section('title', 'Cursos')
-@section('path', 'cursos')
+@section('title', __('Cursos'))
+@section('path', __('cursos'))
 
 @section('content')
 <div class="page-header">
     <div class="page-header__title">
-        <h1 class="h-admin"><span class="fx-type">Cursos.</span></h1>
-        <span class="text-2">{{ $courses->total() }} {{ $courses->total() === 1 ? 'curso' : 'cursos' }}{{ request()->hasAny(['search', 'status']) ? ' con estos filtros' : '' }}</span>
+        <h1 class="h-admin"><span class="fx-type">{{ __('Cursos.') }}</span></h1>
+        <span class="text-2">{{ trans_choice(':count curso|:count cursos', $courses->total()) }}{{ request()->hasAny(['search', 'status']) ? ' '.__('con estos filtros') : '' }}</span>
     </div>
 </div>
 
 <form method="GET" action="{{ route('admin.courses.index') }}" class="search-bar" role="search">
     <div class="search-input-wrapper">
-        <label for="search" class="sr-only">Buscar cursos</label>
-        <input type="search" id="search" name="search" class="form-input" placeholder="buscar por nombre o código…" value="{{ request('search') }}">
+        <label for="search" class="sr-only">{{ __('Buscar cursos') }}</label>
+        <input type="search" id="search" name="search" class="form-input" placeholder="{{ __('buscar por nombre o código…') }}" value="{{ request('search') }}">
     </div>
-    <select name="status" class="form-select" data-auto-submit aria-label="Filtrar por estado">
-        <option value="">todos los estados</option>
-        <option value="active" @selected(request('status') === 'active')>activos</option>
-        <option value="inactive" @selected(request('status') === 'inactive')>inactivos</option>
+    <select name="status" class="form-select" data-auto-submit aria-label="{{ __('Filtrar por estado') }}">
+        <option value="">{{ __('todos los estados') }}</option>
+        <option value="active" @selected(request('status') === 'active')>{{ __('activos') }}</option>
+        <option value="inactive" @selected(request('status') === 'inactive')>{{ __('inactivos') }}</option>
     </select>
-    <button type="submit" class="btn btn-ghost">buscar</button>
+    <button type="submit" class="btn btn-ghost">{{ __('buscar') }}</button>
 </form>
 
 <div class="table-wrapper fx-fade" style="--d: 0.15s">
     <table class="table">
         <thead>
             <tr>
-                <th>código</th>
-                <th>curso</th>
-                <th>duración</th>
-                <th>ocupación</th>
-                <th>estado</th>
-                <th><span class="sr-only">acciones</span></th>
+                <th>{{ __('código') }}</th>
+                <th>{{ __('curso') }}</th>
+                <th>{{ __('duración') }}</th>
+                <th>{{ __('ocupación') }}</th>
+                <th>{{ __('estado') }}</th>
+                <th><span class="sr-only">{{ __('acciones') }}</span></th>
             </tr>
         </thead>
         <tbody>
@@ -47,7 +47,7 @@
                     <td>
                         <a href="{{ route('admin.courses.show', $course) }}" style="display: flex; flex-direction: column; color: var(--text); text-decoration: none;">
                             <span class="t-main">{{ $course->name }}</span>
-                            <span class="t-sub">{{ $course->academic_year_label ? 'curso '.$course->academic_year_label : 'sin fecha de inicio' }}</span>
+                            <span class="t-sub">{{ $course->academic_year_label ? __('curso :year', ['year' => $course->academic_year_label]) : __('sin fecha de inicio') }}</span>
                         </a>
                     </td>
                     <td>{{ $course->duration_hours ? $course->duration_hours.' h' : '—' }}</td>
@@ -63,19 +63,19 @@
                     </td>
                     <td>
                         @if ($course->isActive())
-                            <span class="status status--ok">activo</span>
+                            <span class="status status--ok">{{ __('activo') }}</span>
                         @else
-                            <span class="status status--off">inactivo</span>
+                            <span class="status status--off">{{ __('inactivo') }}</span>
                         @endif
                     </td>
                     <td>
                         <div class="table-actions">
-                            <a href="{{ route('admin.courses.show', $course) }}" class="btn btn-ghost btn-icon" aria-label="Ver {{ $course->name }}"><x-icon name="eye" :size="16" /></a>
-                            <a href="{{ route('admin.courses.edit', $course) }}" class="btn btn-ghost btn-icon" aria-label="Editar {{ $course->name }}"><x-icon name="edit" :size="16" /></a>
+                            <a href="{{ route('admin.courses.show', $course) }}" class="btn btn-ghost btn-icon" aria-label="{{ __('Ver :name', ['name' => $course->name]) }}"><x-icon name="eye" :size="16" /></a>
+                            <a href="{{ route('admin.courses.edit', $course) }}" class="btn btn-ghost btn-icon" aria-label="{{ __('Editar :name', ['name' => $course->name]) }}"><x-icon name="edit" :size="16" /></a>
                             <form method="POST" action="{{ route('admin.courses.destroy', $course) }}">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-icon" aria-label="Eliminar {{ $course->name }}" data-confirm="¿Eliminar el curso «{{ $course->name }}»? No se puede eliminar si tiene matrículas activas."><x-icon name="trash" :size="16" /></button>
+                                <button type="submit" class="btn btn-danger btn-icon" aria-label="{{ __('Eliminar :name', ['name' => $course->name]) }}" data-confirm="{{ __('¿Eliminar el curso «:course»? No se puede eliminar si tiene matrículas activas.', ['course' => $course->name]) }}"><x-icon name="trash" :size="16" /></button>
                             </form>
                         </div>
                     </td>
@@ -84,8 +84,8 @@
                 <tr>
                     <td colspan="6">
                         <div class="empty">
-                            <span class="empty__cmd">ls cursos/ <span class="muted">— sin resultados</span></span>
-                            <span>{{ request()->hasAny(['search', 'status']) ? 'Prueba con otra búsqueda.' : 'Crea el primer curso para empezar.' }}</span>
+                            <span class="empty__cmd">ls {{ __('cursos') }}/ <span class="muted">— {{ __('sin resultados') }}</span></span>
+                            <span>{{ request()->hasAny(['search', 'status']) ? __('Prueba con otra búsqueda.') : __('Crea el primer curso para empezar.') }}</span>
                         </div>
                     </td>
                 </tr>

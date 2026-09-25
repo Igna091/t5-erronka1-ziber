@@ -15,7 +15,7 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (!$request->user() || !$request->user()->isAdmin()) {
-            abort(403, 'Acceso denegado. Solo los administradores pueden acceder a esta sección.');
+            abort(403, __('Acceso denegado. Solo los administradores pueden acceder a esta sección.'));
         }
 
         return $next($request);

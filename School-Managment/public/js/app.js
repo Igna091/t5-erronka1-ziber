@@ -3,6 +3,23 @@
  */
 document.addEventListener('DOMContentLoaded', function () {
 
+    // Texts in the current language, from partials/js-i18n.blade.php
+    let texts = {};
+    try {
+        const holder = document.getElementById('i18n');
+        texts = JSON.parse((holder && holder.getAttribute('data-texts')) || '{}');
+    } catch (e) {
+        texts = {};
+    }
+
+    function t(key, fallback, replace) {
+        let text = texts[key] || fallback;
+        Object.keys(replace || {}).forEach(function (name) {
+            text = text.replace(':' + name, replace[name]);
+        });
+        return text;
+    }
+
     // ==========================================
     // Theme Toggle (Dark/Light Mode)
     // ==========================================
@@ -39,7 +56,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const target = card.getAttribute('data-theme-target');
             if (target) {
                 applyTheme(target);
-                showSettingsToast('Tema cambiado a ' + (target === 'dark' ? 'Modo Oscuro' : 'Modo Claro'));
+                showSettingsToast(target === 'dark'
+                    ? t('themeDark', 'Tema cambiado a modo oscuro')
+                    : t('themeLight', 'Tema cambiado a modo claro'));
             }
         });
     });
@@ -66,83 +85,23 @@ document.addEventListener('DOMContentLoaded', function () {
         radio.addEventListener('change', function () {
             if (radio.checked) {
                 applyFontSize(radio.value);
-                const labels = { small: 'Pequeño', normal: 'Normal', large: 'Grande' };
-                showSettingsToast('Tamaño de texto: ' + (labels[radio.value] || radio.value));
+                const messages = {
+                    small: t('fontSmall', 'Tamaño de texto: pequeño'),
+                    normal: t('fontNormal', 'Tamaño de texto: normal'),
+                    large: t('fontLarge', 'Tamaño de texto: grande')
+                };
+                showSettingsToast(messages[radio.value] || radio.value);
             }
         });
     });
 
     // ==========================================
-    // Language Preference (Settings custom dropdown & select)
+    // Language (settings page): the choice is saved by the server in a cookie.
+    // The select sends its form by itself ([data-auto-submit]), so the button is only for no-JS
     // ==========================================
-    const languageSelect = document.getElementById('languageSelect');
-    const customLangDropdown = document.getElementById('customLanguageDropdown');
-    const customLangTrigger = document.getElementById('customLanguageTrigger');
-    const customLangMenu = document.getElementById('customLanguageMenu');
-    const customLangSelected = document.getElementById('customLanguageSelected');
-
-    const langData = {
-        es: { flag: '🇪🇸', name: 'Español', full: 'Español (España)' },
-        eu: { flag: '🏛️', name: 'Euskera', full: 'Euskera (Euskal Herria)' },
-        en: { flag: '🇬🇧', name: 'English', full: 'English (UK)' }
-    };
-
-    function setLanguage(locale) {
-        const item = langData[locale] || langData['es'];
-        localStorage.setItem('app_locale', locale);
-
-        if (languageSelect) {
-            languageSelect.value = locale;
-        }
-
-        if (customLangSelected) {
-            customLangSelected.innerHTML = '<span class="lang-flag">' + item.flag + '</span><span class="lang-label">' + item.full + '</span>';
-        }
-
-        if (customLangMenu) {
-            customLangMenu.querySelectorAll('.custom-dropdown-option').forEach(function (opt) {
-                const isSelected = opt.getAttribute('data-value') === locale;
-                opt.classList.toggle('active', isSelected);
-                opt.setAttribute('aria-selected', isSelected ? 'true' : 'false');
-            });
-        }
-    }
-
-    if (languageSelect || customLangDropdown) {
-        const savedLocale = localStorage.getItem('app_locale') || 'es';
-        setLanguage(savedLocale);
-
-        if (languageSelect) {
-            languageSelect.addEventListener('change', function () {
-                setLanguage(languageSelect.value);
-                const item = langData[languageSelect.value] || { name: languageSelect.value };
-                showSettingsToast('Idioma cambiado a ' + item.name);
-            });
-        }
-
-        if (customLangTrigger && customLangMenu) {
-            customLangTrigger.addEventListener('click', function (e) {
-                e.stopPropagation();
-                const isOpen = customLangMenu.classList.contains('show');
-                closeAllCustomDropdowns();
-                if (!isOpen) {
-                    customLangMenu.classList.add('show');
-                    customLangTrigger.setAttribute('aria-expanded', 'true');
-                }
-            });
-
-            customLangMenu.querySelectorAll('.custom-dropdown-option').forEach(function (opt) {
-                opt.addEventListener('click', function (e) {
-                    e.stopPropagation();
-                    const chosen = opt.getAttribute('data-value');
-                    setLanguage(chosen);
-                    closeAllCustomDropdowns();
-                    const item = langData[chosen] || { name: chosen };
-                    showSettingsToast('Idioma cambiado a ' + item.name);
-                });
-            });
-        }
-    }
+    document.querySelectorAll('[data-js-hide]').forEach(function (el) {
+        el.hidden = true;
+    });
 
     function closeAllCustomDropdowns() {
         document.querySelectorAll('.custom-dropdown-menu.show').forEach(function (m) {
@@ -281,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener('click', function (e) {
             e.preventDefault();
             var form = btn.closest('form');
-            var message = btn.getAttribute('data-confirm') || '¿Estás seguro?';
+            var message = btn.getAttribute('data-confirm') || t('confirm', '¿Seguro que quieres continuar?');
 
             var overlay = document.getElementById('confirmModal');
             if (overlay) {
@@ -349,7 +308,7 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener('click', function () {
             const show = input.type === 'password';
             input.type = show ? 'text' : 'password';
-            btn.textContent = show ? 'ocultar' : 'mostrar';
+            btn.textContent = show ? t('hide', 'ocultar') : t('show', 'mostrar');
             btn.setAttribute('aria-pressed', show ? 'true' : 'false');
         });
     });
@@ -408,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 btn.replaceChildren.apply(btn, original);
                 return;
             }
-            btn.textContent = 'Espera ' + left + ' s';
+            btn.textContent = t('wait', 'Espera :seconds s', { seconds: left });
             left--;
             setTimeout(tick, 1000);
         }
