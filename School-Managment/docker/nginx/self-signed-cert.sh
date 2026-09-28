@@ -1,6 +1,6 @@
 #!/bin/sh
 # Run by the nginx image before nginx starts.
-# If docker/certs/ has no server.crt + server.key, creates a self-signed certificate for TLS_HOST.
+# If docker/certs/ has no server.crt + server.key, creates a self-signed certificate for SITE_HOST.
 # To use a real certificate, put server.crt and server.key in docker/certs/ and restart "web".
 set -e
 
@@ -12,7 +12,7 @@ if [ -s "$cert" ] && [ -s "$key" ]; then
     exit 0
 fi
 
-host="${TLS_HOST:-localhost}"
+host="${SITE_HOST:-localhost}"
 san="DNS:localhost,IP:127.0.0.1"
 if [ "$host" != "localhost" ]; then
     case "$host" in

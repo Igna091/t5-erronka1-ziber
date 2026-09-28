@@ -8,8 +8,10 @@ ARG PHP_VERSION=8.5
 # ---------- PHP runtime shared by every PHP stage ----------
 FROM php:${PHP_VERSION}-fpm-alpine AS php-base
 
-# Production php.ini. OPcache is built in from PHP 8.5; older versions only need it enabled.
-RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+# Alpine security fixes the base image doesn't have yet, production php.ini,
+# and OPcache (built in from PHP 8.5; older versions only need it enabled)
+RUN apk upgrade --no-cache \
+    && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
     && if ! php -m | grep -qi opcache; then docker-php-ext-enable opcache; fi
 
 WORKDIR /var/www/html
@@ -51,8 +53,10 @@ CMD ["php-fpm"]
 # ---------- Web server: nginx ----------
 FROM nginx:stable-alpine AS web
 
-RUN apk add --no-cache openssl
-COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+# Alpine security fixes the base image doesn't have yet; the stock site is replaced by our template
+RUN apk upgrade --no-cache && apk add --no-cache openssl \
+    && rm /etc/nginx/conf.d/default.conf
+COPY docker/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY docker/nginx/self-signed-cert.sh /docker-entrypoint.d/40-self-signed-cert.sh
 RUN chmod 755 /docker-entrypoint.d/40-self-signed-cert.sh
 

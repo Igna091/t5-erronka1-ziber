@@ -54,6 +54,23 @@ class SecurityTest extends TestCase
         $this->get('https://localhost/login')->assertHeader('Strict-Transport-Security');
     }
 
+    public function test_forged_host_header_is_rejected_in_production(): void
+    {
+        // Trusted hosts are only checked outside local/testing, like on the server
+        $this->app->detectEnvironment(fn () => 'production');
+        config(['app.url' => 'https://educenter.test']);
+
+        try {
+            $this->get('https://evil.example/login')->assertBadRequest();
+
+            $html = $this->get('https://educenter.test/login')->assertOk()->getContent();
+            $this->assertStringNotContainsString('evil.example', $html);
+        } finally {
+            // The trusted host list is static: don't leak it into the other tests
+            Request::setTrustedHosts([]);
+        }
+    }
+
     public function test_pages_have_no_inline_javascript_blocked_by_csp(): void
     {
         $admin = $this->admin();
