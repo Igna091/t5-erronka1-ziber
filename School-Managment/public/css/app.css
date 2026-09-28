@@ -467,6 +467,9 @@ a:hover { color: var(--text); }
 
 .rules { display: flex; flex-direction: column; gap: 0.625rem; padding: 1rem; border: 1px dashed var(--line-2); font-size: 0.8125rem; }
 .rules__head { display: flex; justify-content: space-between; align-items: center; }
+/* --d reset: the panel's fade-in delay would otherwise lag every lit segment */
+.rules__meter { --d: 0s; }
+.rules__meter .seg { width: 1.5rem; height: 0.375rem; }
 .rule { display: flex; gap: 0.75rem; color: var(--muted); transition: color 0.25s ease; }
 .rule::before { content: "[ ]"; flex-shrink: 0; }
 .rule.is-ok { color: var(--acc); }

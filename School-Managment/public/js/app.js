@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const pw = form && form.querySelector('[data-password]');
         const confirmation = form && form.querySelector('[data-password-confirm]');
         const submit = form && form.querySelector('[type="submit"]');
-        const meter = box.querySelector('[data-rules-meter]');
+        const segments = box.querySelectorAll('[data-rules-meter] .seg');
         if (!pw || !confirmation) return;
 
         const checks = {
@@ -340,8 +340,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (rule) rule.classList.toggle('is-ok', ok);
                 if (ok) passed++;
             });
-            const lit = Math.round((passed / keys.length) * 10);
-            if (meter) meter.textContent = '[' + '#'.repeat(lit) + '-'.repeat(10 - lit) + ']';
+            segments.forEach(function (seg, i) {
+                seg.classList.toggle('is-on', i < passed);
+            });
             if (submit) submit.disabled = passed !== keys.length;
         }
 
