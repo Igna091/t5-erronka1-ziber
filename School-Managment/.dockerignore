@@ -1,0 +1,39 @@
+# Kept out of the images: secrets, local data, dev tooling and things rebuilt inside the image
+.git
+.gitignore
+.gitattributes
+.editorconfig
+.agents
+.idea
+.vscode
+.env
+.env.*
+docker/certs
+
+vendor
+node_modules
+storage
+bootstrap/cache/*.php
+database/*.sqlite*
+
+public/hot
+public/build
+public/storage
+public/fonts-manifest.dev.json
+
+tests
+security
+phpunit.xml
+.phpunit.result.cache
+package.json
+package-lock.json
+.npmrc
+vite.config.js
+boost.json
+AGENTS.md
+CLAUDE.md
+README.md
+logo Claro.png
+Logo Oscuro.png
+Dockerfile
+compose.yaml

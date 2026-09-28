@@ -1,0 +1,55 @@
+# EduCenter on Docker (Ubuntu Server)
+#   cp .env.docker.example .env        then fill it in
+#   docker compose up -d --build
+# The site is served at https://SITE_HOST (http:// redirects to https://)
+
+name: educenter
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+  app:
+    build:
+      context: .
+      target: app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # Fixed by the image layout, so they are set here and not in .env
+      DB_CONNECTION: sqlite
+      DB_DATABASE: /var/www/html/database/data/database.sqlite
+    volumes:
+      - database:/var/www/html/database/data
+      - storage:/var/www/html/storage
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    logging: *logging
+
+  web:
+    build:
+      context: .
+      target: web
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      TLS_HOST: ${SITE_HOST:-localhost}
+    volumes:
+      # server.crt + server.key (a self-signed pair is created here if missing)
+      - ./docker/certs:/etc/nginx/certs
+    security_opt:
+      - no-new-privileges:true
+    logging: *logging
+
+volumes:
+  database:
+  storage:
