@@ -6,7 +6,7 @@ Zibersegurtasun-arloko proiektua (1. erronka): ZiberEibar-eko ikastaroak kudeatz
 
 | Karpeta | Zer da |
 |---|---|
-| [`School-Managment/`](School-Managment/) | **EduCenter** web-aplikazioa (Laravel): ikasleak, ikastaroak eta matrikulak kudeatzeko sistema. Ezaugarriak, arkitektura, instalazioa eta Docker bidezko inplementazioa bere [README](School-Managment/README.md) fitxategian daude. |
+| [`School-Managment/`](School-Managment/) | **ZiberEibar** web-aplikazioa (Laravel): ikasleak, ikastaroak eta matrikulak kudeatzeko sistema. Ezaugarriak, arkitektura, instalazioa eta Docker bidezko inplementazioa bere [README](School-Managment/README.md) fitxategian daude. |
 | [`School-Managment/security/`](School-Managment/security/) | Segurtasun-probak: 33 egiaztapeneko script-a (OWASP Top 10), txostenak eta aurkitutako eta konpondutako ahultasunen zerrenda. Ikus [security/README.md](School-Managment/security/README.md). |
 
 ## Hasiera azkarra
