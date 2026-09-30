@@ -7,7 +7,9 @@ use App\Models\Enrollment;
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -40,6 +42,14 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('login', fn (Request $request) => [
             Limit::perMinute(60)->by('login-ip:'.$request->ip()),
         ]);
+
+        // The mail header shows the logo as "cid:logo": it goes inside the email, because
+        // mail clients can't load images from this server (private address, self-signed HTTPS)
+        Event::listen(function (MessageSending $event) {
+            if (str_contains((string) $event->message->getHtmlBody(), 'cid:logo')) {
+                $event->message->embedFromPath(public_path('images/logo-email.png'), 'logo');
+            }
+        });
 
         Paginator::defaultView('vendor.pagination.senal');
         Paginator::defaultSimpleView('vendor.pagination.senal');

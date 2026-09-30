@@ -1,0 +1,1 @@
+<p class="kicker">{{ $slot }}</p>

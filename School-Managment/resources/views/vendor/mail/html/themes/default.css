@@ -1,0 +1,401 @@
+/* ==========================================================================
+   ZiberEibar emails: the site's "Señal" design (public/css/app.css) for mail clients.
+   Laravel copies these rules into each element's style attribute, because most
+   clients ignore <style>. Solid colors only: Outlook doesn't support rgba().
+   Display: Chakra Petch · Body: JetBrains Mono (Gmail and Outlook use the fallbacks)
+   ========================================================================== */
+
+/* Base */
+
+body,
+body *:not(html):not(style):not(br):not(tr):not(code) {
+    box-sizing: border-box;
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+body {
+    -webkit-text-size-adjust: none;
+    background-color: #070B1A;
+    color: #B7C1E4;
+    height: 100%;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    width: 100% !important;
+}
+
+p,
+ul,
+ol,
+blockquote {
+    line-height: 1.75;
+    text-align: start;
+}
+
+a {
+    color: #3AD0FF;
+}
+
+a img {
+    border: none;
+}
+
+/* Typography */
+
+.content-cell h1 {
+    color: #E6EBFF;
+    font-family: 'Chakra Petch', 'Arial Narrow', Arial, sans-serif;
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    line-height: 1.05;
+    margin: 0 0 20px;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.content-cell h2 {
+    color: #E6EBFF;
+    font-family: 'Chakra Petch', 'Arial Narrow', Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 28px 0 12px;
+    text-transform: uppercase;
+}
+
+.content-cell h3 {
+    color: #E6EBFF;
+    font-size: 15px;
+    font-weight: 700;
+    margin: 24px 0 8px;
+}
+
+p {
+    color: #B7C1E4;
+    font-size: 15px;
+    line-height: 1.75;
+    margin: 0 0 18px;
+}
+
+p.sub {
+    font-size: 12px;
+}
+
+img {
+    max-width: 100%;
+}
+
+/* Layout */
+
+.wrapper {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #070B1A;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.wrapper-cell {
+    padding: 0 16px;
+}
+
+.content {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+/* Header: logo + "ziber_eibar" with the blinking-cursor block of the site */
+
+.header {
+    padding: 36px 0 18px;
+}
+
+.header-inner {
+    margin: 0 auto;
+    width: 600px;
+}
+
+.brand-logo {
+    padding-right: 12px;
+    vertical-align: middle;
+    width: 40px;
+}
+
+.logo {
+    display: block;
+    height: 40px;
+    width: 40px;
+}
+
+.brand-name {
+    vertical-align: middle;
+}
+
+.brand-name a {
+    color: #E6EBFF;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+}
+
+.cursor {
+    background-color: #3AD0FF;
+    display: inline-block;
+    font-size: 18px;
+    height: 17px;
+    line-height: 17px;
+    margin-left: 3px;
+    vertical-align: -2px;
+    width: 9px;
+}
+
+/* Body: the card */
+
+.body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    background-color: #070B1A;
+    border-bottom: 1px solid #070B1A;
+    border-top: 1px solid #070B1A;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.inner-body {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 600px;
+    background-color: #0C1330;
+    border: 1px solid #2B3A6A;
+    border-top: 3px solid #3AD0FF;
+    margin: 0 auto;
+    padding: 0;
+    width: 600px;
+}
+
+.content-cell {
+    max-width: 100vw;
+    padding: 40px;
+}
+
+/* Section label, like the site's .kicker */
+
+.kicker {
+    color: #3AD0FF;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    line-height: 1.4;
+    margin: 0 0 14px;
+    text-transform: uppercase;
+}
+
+/* Subcopy: the link to copy if the button doesn't work */
+
+.subcopy {
+    border-top: 1px solid #1E2A51;
+    margin-top: 28px;
+    padding-top: 22px;
+}
+
+.subcopy p {
+    color: #97A3CC;
+    font-size: 12px;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.subcopy a {
+    color: #3AD0FF;
+}
+
+/* Footer */
+
+.footer {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 600px;
+    margin: 0 auto;
+    padding: 0;
+    width: 600px;
+}
+
+.footer-cell {
+    padding: 22px 0 40px;
+}
+
+.footer p {
+    color: #5F6B93;
+    font-size: 12px;
+    line-height: 1.8;
+    margin: 0;
+}
+
+.footer a {
+    color: #97A3CC;
+    text-decoration: none;
+}
+
+/* Tables */
+
+.table table {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 28px 0;
+    width: 100%;
+}
+
+.table th {
+    border-bottom: 1px solid #2B3A6A;
+    color: #97A3CC;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    margin: 0;
+    padding-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.table td {
+    border-bottom: 1px solid #1E2A51;
+    color: #B7C1E4;
+    font-size: 14px;
+    line-height: 18px;
+    margin: 0;
+    padding: 10px 0;
+}
+
+/* Buttons: square and cyan, like the site's .btn-primary. The borders make the padding,
+   because Outlook ignores padding on links. */
+
+.action {
+    -premailer-cellpadding: 0;
+    -premailer-cellspacing: 0;
+    -premailer-width: 100%;
+    margin: 8px 0 30px;
+    padding: 0;
+    width: 100%;
+}
+
+.button {
+    -webkit-text-size-adjust: none;
+    color: #070B1A;
+    display: inline-block;
+    font-family: 'Chakra Petch', 'Arial Narrow', Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    overflow: hidden;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+
+.button-blue,
+.button-primary,
+.button-green,
+.button-success {
+    background-color: #3AD0FF;
+    border-bottom: 15px solid #3AD0FF;
+    border-left: 28px solid #3AD0FF;
+    border-right: 28px solid #3AD0FF;
+    border-top: 15px solid #3AD0FF;
+}
+
+.button-red,
+.button-error {
+    background-color: #FF6B81;
+    border-bottom: 15px solid #FF6B81;
+    border-left: 28px solid #FF6B81;
+    border-right: 28px solid #FF6B81;
+    border-top: 15px solid #FF6B81;
+}
+
+/* Panels: a note with a cyan edge and a label, like the site's panels */
+
+.panel {
+    border: 1px solid #2B3A6A;
+    border-left: 3px solid #3AD0FF;
+    margin: 0 0 28px;
+}
+
+.panel-content {
+    background-color: #0F1B3C;
+    padding: 16px 20px;
+}
+
+.panel-label {
+    color: #3AD0FF;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    padding-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.panel-content p {
+    color: #E6EBFF;
+}
+
+.panel-item {
+    padding: 0;
+}
+
+.panel-item p {
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.panel-item p:last-of-type {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+/* Steps checklist, like the site's .steps: [x] done, [>] now, [ ] next */
+
+.steps {
+    margin: 0 0 28px;
+}
+
+.step-mark {
+    color: #5F6B93;
+    font-size: 13px;
+    padding: 3px 12px 3px 0;
+    vertical-align: top;
+    white-space: nowrap;
+    width: 1%;
+}
+
+.step-mark--done,
+.step-mark--now {
+    color: #3AD0FF;
+}
+
+.step-text {
+    color: #97A3CC;
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 3px 0;
+}
+
+.step-text--done {
+    color: #B7C1E4;
+}
+
+.step-text--now {
+    color: #E6EBFF;
+    font-weight: 700;
+}
+
+/* Utilities */
+
+.break-all {
+    word-break: break-all;
+}

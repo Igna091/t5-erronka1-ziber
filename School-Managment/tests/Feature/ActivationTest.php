@@ -370,4 +370,16 @@ class ActivationTest extends TestCase
         $this->assertStringContainsString(e($link['url']), $html);
         $this->assertStringContainsString('copia y pega este enlace', $html);
     }
+
+    public function test_activation_email_carries_the_logo_it_shows(): void
+    {
+        $student = $this->pendingStudent();
+
+        app(AccountActivation::class)->send($student);
+
+        // Mail clients can't load images from the server, so the logo travels inside the email
+        $raw = quoted_printable_decode($this->sentEmails()->sole()->toString());
+        $this->assertSame(1, preg_match('/Content-ID: <([^>]+)>/', $raw, $logo));
+        $this->assertStringContainsString('src="cid:'.$logo[1].'"', $raw);
+    }
 }

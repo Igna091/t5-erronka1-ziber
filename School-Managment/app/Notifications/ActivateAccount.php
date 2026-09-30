@@ -42,13 +42,8 @@ class ActivateAccount extends Notification implements ShouldBeEncrypted, ShouldQ
     {
         return (new MailMessage)
             ->subject(__('Activa tu cuenta en ZiberEibar'))
-            ->greeting(__('¡Hola, :name!', ['name' => $notifiable->name]))
-            ->line(__('El centro te ha dado de alta como alumno/a en ZiberEibar.'))
-            ->line(__('Para empezar, activa tu cuenta y elige tu contraseña:'))
             ->action(__('Activar mi cuenta'), app(AccountActivation::class)->link($this->email, $this->token))
-            ->line(__('El enlace caduca en 7 días y solo se puede usar una vez.'))
-            ->line(__('Si no esperabas este correo, puedes ignorarlo.'))
-            ->salutation(__('Un saludo, el equipo de ZiberEibar'));
+            ->markdown('emails.activate-account', ['name' => $notifiable->name]);
     }
 
     /**
