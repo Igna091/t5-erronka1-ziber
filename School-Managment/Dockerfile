@@ -1,5 +1,5 @@
 # EduCenter production images (multi-stage):
-#   app -> PHP-FPM with the application, runs as www-data
+#   app -> PHP-FPM with the application, runs as www-data (also the queue worker)
 #   web -> nginx: serves public/ over HTTPS and sends PHP requests to "app"
 # Built by compose.yaml: docker compose up -d --build
 
@@ -34,6 +34,9 @@ RUN mkdir -p database/data storage/app/private storage/app/public storage/framew
 
 # ---------- Application: PHP-FPM ----------
 FROM php-base AS app
+
+# pcntl lets the queue worker finish the email it is sending when the container stops
+RUN docker-php-ext-install pcntl
 
 COPY docker/php/app.ini "$PHP_INI_DIR/conf.d/zz-app.ini"
 COPY docker/php/fpm-pool.conf /usr/local/etc/php-fpm.d/zz-app.conf

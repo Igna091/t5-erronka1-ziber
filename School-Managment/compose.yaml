@@ -11,29 +11,45 @@ x-logging: &logging
     max-size: "10m"
     max-file: "5"
 
+# Shared by "app" and "queue": same image, settings and data
+x-php: &php
+  build:
+    context: .
+    target: app
+  restart: unless-stopped
+  env_file: .env
+  environment:
+    # Fixed by the image layout, so they are set here and not in .env
+    DB_CONNECTION: sqlite
+    DB_DATABASE: /var/www/html/database/data/database.sqlite
+    # Emails wait in the database until the "queue" container sends them
+    QUEUE_CONNECTION: database
+  volumes:
+    - database:/var/www/html/database/data
+    - storage:/var/www/html/storage
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  logging: *logging
+
 services:
   app:
-    build:
-      context: .
-      target: app
-    restart: unless-stopped
-    env_file: .env
-    environment:
-      # Fixed by the image layout, so they are set here and not in .env
-      DB_CONNECTION: sqlite
-      DB_DATABASE: /var/www/html/database/data/database.sqlite
-    volumes:
-      - database:/var/www/html/database/data
-      - storage:/var/www/html/storage
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
+    <<: *php
     # A runaway process (or a fork bomb) can't take the whole server down.
     # 10 PHP workers x 64 MB per argon2id login fit comfortably.
     mem_limit: 1536m
     pids_limit: 200
-    logging: *logging
+
+  # Sends the emails outside the web requests, so a slow or failing mail server doesn't
+  # hold up the pages. A failed email is retried 3 times, a minute apart.
+  queue:
+    <<: *php
+    command: ["php", "artisan", "queue:work", "--tries=3", "--backoff=60"]
+    depends_on:
+      - app # creates the database and runs the migrations
+    mem_limit: 256m
+    pids_limit: 50
 
   web:
     build:

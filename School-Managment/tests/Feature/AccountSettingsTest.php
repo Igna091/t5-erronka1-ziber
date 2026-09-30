@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Middleware\SetLocale;
 use App\Models\Role;
 use App\Models\User;
 use App\Notifications\AccountChanged;
@@ -258,6 +259,27 @@ class AccountSettingsTest extends TestCase
         $this->assertSame('El email de tu cuenta de ZiberEibar ha cambiado', $mail->subject);
         $this->assertStringContainsString('a***@educenter.es', $text);
         $this->assertStringNotContainsString('ana.nueva', $text);
+    }
+
+    public function test_notice_shows_when_the_change_was_made_even_if_the_worker_sends_it_later(): void
+    {
+        $this->travelTo('2026-03-10 09:15:00');
+        $notification = new AccountChanged(AccountChanged::PASSWORD, 'Ana');
+
+        $this->travelTo('2026-03-10 09:47:00');
+        $mail = $notification->toMail(new AnonymousNotifiable);
+
+        $this->assertSame('La contraseña de tu cuenta se cambió el 10/03/2026 a las 09:15.', $mail->introLines[0]);
+    }
+
+    public function test_notice_is_sent_in_the_language_the_user_was_using(): void
+    {
+        $user = $this->user();
+
+        $this->withUnencryptedCookie(SetLocale::COOKIE, 'eu');
+        $this->changePassword($user);
+
+        Notification::assertSentOnDemand(AccountChanged::class, fn (AccountChanged $notification) => $notification->locale === 'eu');
     }
 
     // -------------------------------------------------------------- safety

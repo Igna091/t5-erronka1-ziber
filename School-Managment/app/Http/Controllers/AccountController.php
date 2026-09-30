@@ -84,7 +84,7 @@ class AccountController extends Controller
     private function notify(string $email, AccountChanged $notification): void
     {
         try {
-            Notification::route('mail', $email)->notify($notification); // in the current language
+            Notification::route('mail', $email)->notify($notification);
         } catch (TransportExceptionInterface $e) {
             report($e);
         }

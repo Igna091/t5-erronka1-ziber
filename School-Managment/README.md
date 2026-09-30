@@ -127,9 +127,10 @@ Ondoren, ireki <http://localhost:8000>.
 
 ## Inplementazioa Docker-ekin
 
-Produkziorako bi edukiontzi daude:
+Produkziorako hiru edukiontzi daude:
 
 - **app**: PHP-FPM eta aplikazioa, `www-data` erabiltzailearekin.
+- **queue**: `app`-en irudi bera. Emailak (aktibazio-estekak eta kontu-abisuak) web-eskaeratik kanpo bidaltzen ditu, eta horrela posta-zerbitzari motel edo erori batek ez ditu orriak blokeatzen. Bidalketak huts egiten badu, 3 aldiz saiatzen da, minutu bateko tartearekin. Aktibazio-email bat ezin bada bidali, haren esteka ezabatu egiten da, eta administratzaileak berriro bidal dezake.
 - **web**: nginx. `public/` karpeta bakarrik zerbitzatzen du HTTPS bidez, eta PHP eskaerak `app` edukiontzira bidaltzen ditu.
 
 Datu-basea eta `storage/` karpeta Docker bolumenetan gordetzen dira (`educenter_database` eta `educenter_storage`), beraz ez dira galtzen edukiontziak berreraikitzean.

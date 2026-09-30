@@ -3,14 +3,18 @@
 namespace Tests\Feature;
 
 use App\Http\Controllers\AuthController;
+use App\Http\Middleware\SetLocale;
 use App\Models\Role;
 use App\Models\User;
 use App\Notifications\ActivateAccount;
 use App\Services\AccountActivation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Mailer\SentMessage;
 use Tests\TestCase;
 
 class ActivationTest extends TestCase
@@ -47,6 +51,16 @@ class ActivationTest extends TestCase
         parse_str(parse_url($url, PHP_URL_QUERY), $query);
 
         return ['token' => basename(parse_url($url, PHP_URL_PATH)), 'email' => $query['email'], 'url' => $url];
+    }
+
+    /**
+     * Emails delivered by the "array" mailer (MAIL_MAILER in phpunit.xml).
+     *
+     * @return Collection<int, SentMessage>
+     */
+    private function sentEmails(): Collection
+    {
+        return app('mailer')->getSymfonyTransport()->messages();
     }
 
     private function activate(array $link, array $data = [])
@@ -290,20 +304,70 @@ class ActivationTest extends TestCase
         $this->assertSame(0, DB::table('activation_tokens')->count());
     }
 
+    // --- Queue worker (Docker: QUEUE_CONNECTION=database) ------------------------------
+
+    public function test_activation_email_waits_for_the_worker_encrypted_and_in_the_admins_language(): void
+    {
+        config(['queue.default' => 'database']);
+
+        $this->withUnencryptedCookie(SetLocale::COOKIE, 'eu')->actingAs($this->admin())
+            ->post(route('admin.students.store'), [
+                'name' => 'Iker',
+                'surname' => 'López',
+                'email' => 'iker@educenter.es',
+                'dni' => '11111111H',
+            ])->assertSessionHas('success')->assertSessionMissing('error');
+        $queuedJob = DB::table('jobs')->value('payload');
+        $this->assertCount(0, $this->sentEmails());
+
+        app()->setLocale('es'); // the worker starts with the default language
+        $this->artisan('queue:work', ['--once' => true])->assertSuccessful();
+
+        $email = $this->sentEmails()->sole()->getOriginalMessage();
+        $this->assertSame('Aktibatu zure ZiberEibar kontua', $email->getSubject());
+        $this->assertSame(1, preg_match('#/activar/([0-9a-f]{64})\?#', $email->getHtmlBody(), $token));
+        $this->assertStringNotContainsString($token[1], $queuedJob);
+    }
+
+    public function test_activation_link_is_removed_when_the_worker_cannot_deliver_the_email(): void
+    {
+        config(['queue.default' => 'database', 'mail.default' => 'smtp', 'mail.mailers.smtp.host' => '127.0.0.1', 'mail.mailers.smtp.port' => 1]);
+        $student = $this->pendingStudent();
+
+        $this->actingAs($this->admin())->post(route('admin.students.resend-activation', $student))
+            ->assertSessionHas('success');
+        $this->artisan('queue:work', ['--once' => true]);
+
+        // The admin sees it as not sent and can send it again straight away
+        $this->assertSame(0, DB::table('activation_tokens')->count());
+        $this->assertSame(1, DB::table('failed_jobs')->count());
+    }
+
+    public function test_a_failed_email_keeps_a_newer_link_sent_in_the_meantime(): void
+    {
+        $student = $this->pendingStudent();
+        $failed = $this->link($student);
+        $newer = $this->link($student);
+
+        (new ActivateAccount($failed['email'], $failed['token']))->failed(new TransportException('SMTP caído'));
+
+        $this->activate($newer)->assertRedirect(route('courses.index'));
+    }
+
     // --- Email content ---------------------------------------------------------------
 
     public function test_activation_email_is_in_spanish_and_contains_the_link(): void
     {
         $student = $this->pendingStudent();
-        $url = $this->link($student)['url'];
+        $link = $this->link($student);
 
-        $mail = (new ActivateAccount($url))->toMail($student);
+        $mail = (new ActivateAccount($link['email'], $link['token']))->toMail($student);
         app()->setLocale('es');
         $html = (string) $mail->render();
 
         $this->assertSame('Activa tu cuenta en ZiberEibar', $mail->subject);
         $this->assertStringContainsString('¡Hola, Ana!', $html);
-        $this->assertStringContainsString(e($url), $html);
+        $this->assertStringContainsString(e($link['url']), $html);
         $this->assertStringContainsString('copia y pega este enlace', $html);
     }
 }

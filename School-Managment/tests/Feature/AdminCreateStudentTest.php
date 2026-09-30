@@ -97,8 +97,8 @@ class AdminCreateStudentTest extends TestCase
 
         $student = User::firstWhere('email', 'iker@educenter.es');
         $url = null;
-        Notification::assertSentTo($student, ActivateAccount::class, function (ActivateAccount $notification) use (&$url) {
-            $url = $notification->url;
+        Notification::assertSentTo($student, ActivateAccount::class, function (ActivateAccount $notification) use (&$url, $student) {
+            $url = $notification->toMail($student)->actionUrl;
 
             return true;
         });

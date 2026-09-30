@@ -2,24 +2,40 @@
 
 namespace App\Notifications;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeEncrypted;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Carbon;
 
 /**
  * Security notice after the password or the login email of an account changes,
- * so the owner finds out if it wasn't them.
+ * so the owner finds out if it wasn't them. Sent by the queue worker (encrypted,
+ * as it holds personal data).
  */
-class AccountChanged extends Notification
+class AccountChanged extends Notification implements ShouldBeEncrypted, ShouldQueue
 {
+    use Queueable;
+
     public const PASSWORD = 'password';
 
     public const EMAIL = 'email';
+
+    /**
+     * When the change was made (the worker may send the email a while later).
+     */
+    public Carbon $changedAt;
 
     public function __construct(
         public string $change,
         public string $name,
         public ?string $newEmail = null,
     ) {
+        $this->changedAt = now();
+
+        // In the language of whoever makes the change, not the worker's default one
+        $this->locale(app()->getLocale());
     }
 
     /**
@@ -37,7 +53,7 @@ class AccountChanged extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $when = ['date' => now()->format('d/m/Y'), 'time' => now()->format('H:i')];
+        $when = ['date' => $this->changedAt->format('d/m/Y'), 'time' => $this->changedAt->format('H:i')];
         $mail = (new MailMessage)->greeting(__('¡Hola, :name!', ['name' => $this->name]));
 
         if ($this->change === self::PASSWORD) {

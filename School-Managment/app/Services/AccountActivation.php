@@ -43,16 +43,24 @@ class AccountActivation
      */
     public function createLink(User $student): string
     {
-        $token = $this->broker()->createToken($student);
-
-        return route('activation.show', ['token' => $token, 'email' => $student->email]);
+        return $this->link($student->email, $this->broker()->createToken($student));
     }
 
     /**
-     * Email a new activation link to the student.
+     * Address of the page where the student activates the account with this token.
+     */
+    public function link(string $email, string $token): string
+    {
+        return route('activation.show', ['token' => $token, 'email' => $email]);
+    }
+
+    /**
+     * Email a new activation link to the student. The email is queued, so this returns
+     * straight away; if it can't be delivered, ActivateAccount::failed() removes the link.
      * Returns false (and sends nothing) if one was sent less than a minute ago.
      *
-     * @throws TransportExceptionInterface when the email can't be sent (SMTP down, wrong credentials...)
+     * @throws TransportExceptionInterface only without a queue worker (QUEUE_CONNECTION=sync),
+     *                                     when the email can't be sent (SMTP down, wrong credentials...)
      */
     public function send(User $student): bool
     {
@@ -60,18 +68,22 @@ class AccountActivation
             return false;
         }
 
-        $url = $this->createLink($student);
-
-        try {
-            $student->notify(new ActivateAccount($url)); // in the language of whoever triggers it
-        } catch (TransportExceptionInterface $e) {
-            // Don't leave a link nobody received (and don't block the retry)
-            $this->broker()->deleteToken($student);
-
-            throw $e;
-        }
+        $student->notify(new ActivateAccount($student->email, $this->broker()->createToken($student)));
 
         return true;
+    }
+
+    /**
+     * Remove a link whose email couldn't be delivered. A newer link, sent in the
+     * meantime, is kept: it's the one the student may still receive.
+     */
+    public function discard(string $email, string $token): void
+    {
+        $student = $this->pendingStudent($email);
+
+        if ($student && $this->isValid($student, $token)) {
+            $this->broker()->deleteToken($student);
+        }
     }
 
     /**
