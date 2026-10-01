@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\Role;
 use App\Models\User;
 use App\Notifications\ActivateAccount;
 use Illuminate\Auth\Passwords\PasswordBroker;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -12,9 +14,9 @@ use Illuminate\Support\Facades\Password;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 /**
- * Activation links for students created by an admin. Tokens are handled by Laravel's
- * password broker ("activations" in config/auth.php): stored hashed, expire in 7 days
- * and can't be requested more than once a minute.
+ * Activation links for students and teachers created by an admin. Tokens are handled by
+ * Laravel's password broker ("activations" in config/auth.php): stored hashed, expire in
+ * 7 days and can't be requested more than once a minute.
  */
 class AccountActivation
 {
@@ -24,15 +26,16 @@ class AccountActivation
     }
 
     /**
-     * Find a student whose account is still pending activation.
+     * Find a student or teacher whose account is still pending activation.
+     * Admin accounts are never activated with a link.
      */
-    public function pendingStudent(?string $email): ?User
+    public function pendingAccount(?string $email): ?User
     {
         if (!$email) {
             return null;
         }
 
-        return User::students()
+        return User::whereHas('role', fn (Builder $q) => $q->whereIn('name', [Role::STUDENT, Role::TEACHER]))
             ->where('email', strtolower(trim($email)))
             ->where('is_registered', false)
             ->first();
@@ -79,7 +82,7 @@ class AccountActivation
      */
     public function discard(string $email, string $token): void
     {
-        $student = $this->pendingStudent($email);
+        $student = $this->pendingAccount($email);
 
         if ($student && $this->isValid($student, $token)) {
             $this->broker()->deleteToken($student);

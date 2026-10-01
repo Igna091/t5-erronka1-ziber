@@ -24,13 +24,14 @@
 
 - **Panela**: ikasle, ikastaro, matrikula eta plaza libreen estatistikak.
 - **Ikasleak**: sortu, editatu, ezabatu eta bilatu. Administratzaileak ikasle bat sortzen duenean, ikasleak aktibazio-esteka bat jasotzen du emailez eta berak aukeratzen du pasahitza.
+- **Irakasleak**: irakasle berria sortu ("irakasle berria" lasterbidea) eta ikastaro oso bati, ikastaroaren irakasgai batzuei edo bertan sortutako irakasgai berri bati esleitu. Ikasleek bezala, aktibazio-esteka bat jasotzen du emailez. Ikastaroaren fitxan haren irakasleak ikusten dira.
 - **Aktibazioak**: kontua oraindik aktibatu ez duten ikasleen zerrenda. Esteka berriro bidal daiteke, banaka edo guztiei batera.
 - **Ikastaroak**: sortu, editatu eta ezabatu (edukiera, datak, ikasturtea eta egoera).
 - **Matrikulak**: ikasle bat ikastaro batean matrikulatu, eta matrikula bat bertan behera utzi edo berriro aktibatu.
 
 ### Irakasleak
 
-Saioa hasi eta ikastaroen katalogoa ikus dezakete. Ikastaro bakoitzaren irakasgaietan irakasle gisa agertzen dira. Oraingoz ez dute panel propiorik.
+Administratzaileak sortzen ditu, eta kontua aktibatzeko esteka jasotzen dute emailez. Saioa hasi eta ikastaroen katalogoa ikus dezakete. Ikastaro bakoitzaren irakasgaietan irakasle gisa agertzen dira. Oraingoz ez dute panel propiorik.
 
 ### Guztientzat
 
@@ -41,7 +42,7 @@ Saioa hasi eta ikastaroen katalogoa ikus dezakete. Ikastaro bakoitzaren irakasga
 
 ### Kontu baten aktibazioa
 
-1. Administratzaileak ikaslea sortzen du.
+1. Administratzaileak ikaslea (edo irakaslea) sortzen du.
 2. Ikasleak aktibazio-esteka bat jasotzen du emailez. Esteka behin bakarrik erabil daiteke, 7 egunean iraungitzen da eta datu-basean hash eginda gordetzen da.
 3. Ikasleak bere pasahitza aukeratzen du (gutxienez 8 karaktere, letrak eta zenbakiak) eta kontua aktibatuta geratzen da. Ordura arte ezin da saioa hasi.
 4. Esteka iraungi bada, ikasleak berri bat eska dezake `/register` orrian (egunean 5 gehienez), edo administratzaileak bidal diezaioke.
@@ -58,6 +59,7 @@ Saioa hasi eta ikastaroen katalogoa ikus dezakete. Ikastaro bakoitzaren irakasga
 | `/mis-matriculas`, `/mi-perfil` | Ikasleak | Matrikulak eta profila |
 | `/ajustes` | Guztiek | Ezarpenak |
 | `/administracion` | Administratzaileak | Administrazio-panela |
+| `/administracion/profesores/crear` | Administratzaileak | Irakasle berria sortu eta ikastaro edo irakasgai bati esleitu |
 
 ## Teknologiak
 
@@ -90,6 +92,7 @@ Datu-eredua:
 - `users` eta `roles`: erabiltzaileak eta haien rola (`admin`, `teacher` edo `student`).
 - `courses`: ikastaroak.
 - `subjects` eta `course_subject`: ikastaro bakoitzaren irakasgaiak eta irakaslea.
+- `course_teacher`: ikastaro osoari esleitutako irakasleak.
 - `enrollments`: matrikulak (ikaslea + ikastaroa, `active` edo `cancelled` egoeran).
 - `grades`: kalifikazioak. Datu-basean daude, baina oraingoz ez dute interfazerik.
 

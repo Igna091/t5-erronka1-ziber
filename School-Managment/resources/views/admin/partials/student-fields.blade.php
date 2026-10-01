@@ -1,4 +1,4 @@
-{{-- Student form fields (create + edit). $student is optional. --}}
+{{-- Person form fields: students (create + edit) and new teachers. $student and $emailPlaceholder are optional. --}}
 <div class="form-row">
     <div class="form-group">
         <label for="name" class="form-label">{{ __('nombre') }} <span class="req">*</span></label>
@@ -14,7 +14,7 @@
 <div class="form-row">
     <div class="form-group">
         <label for="email" class="form-label">{{ __('email') }} <span class="req">*</span></label>
-        <input type="email" id="email" name="email" class="form-input @error('email') is-invalid @enderror" value="{{ old('email', $student->email ?? '') }}" required maxlength="255" autocomplete="off" placeholder="{{ __('alumno@email.com') }}">
+        <input type="email" id="email" name="email" class="form-input @error('email') is-invalid @enderror" value="{{ old('email', $student->email ?? '') }}" required maxlength="255" autocomplete="off" placeholder="{{ $emailPlaceholder ?? __('alumno@email.com') }}">
         @error('email')<span class="form-error">{{ $message }}</span>@enderror
     </div>
     <div class="form-group">

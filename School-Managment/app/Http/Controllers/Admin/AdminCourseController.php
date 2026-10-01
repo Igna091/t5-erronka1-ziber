@@ -66,7 +66,7 @@ class AdminCourseController extends Controller
      */
     public function show(Course $course)
     {
-        $course->load(['enrollments.student']);
+        $course->load(['enrollments.student', 'teachers', 'courseSubjects.subject', 'courseSubjects.teacher']);
         $course->loadCount(['enrollments' => function ($q) {
             $q->where('status', 'active');
         }]);

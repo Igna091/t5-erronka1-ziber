@@ -178,13 +178,25 @@ class ActivationTest extends TestCase
         Notification::assertSentTo($student, ActivateAccount::class);
     }
 
+    public function test_pending_teacher_can_request_a_new_link(): void
+    {
+        Notification::fake();
+        $teacher = $this->user(Role::TEACHER, 'profe@educenter.es', false);
+
+        $this->from('/register')->post('/register', ['email' => 'profe@educenter.es'])
+            ->assertSessionHas('success', AuthController::ACTIVATION_SENT_MESSAGE);
+
+        Notification::assertSentTo($teacher, ActivateAccount::class);
+    }
+
     public function test_resend_page_does_not_reveal_which_emails_exist(): void
     {
         Notification::fake();
         $this->user(Role::STUDENT, 'activa@educenter.es', true);
-        $this->user(Role::TEACHER, 'profe@educenter.es', false);
+        // Admin accounts are never activated with a link
+        $this->user(Role::ADMIN, 'admin-pendiente@educenter.es', false);
 
-        foreach (['noexiste@educenter.es', 'activa@educenter.es', 'profe@educenter.es'] as $email) {
+        foreach (['noexiste@educenter.es', 'activa@educenter.es', 'admin-pendiente@educenter.es'] as $email) {
             $this->from('/register')->post('/register', ['email' => $email])
                 ->assertSessionHas('success', AuthController::ACTIVATION_SENT_MESSAGE);
         }

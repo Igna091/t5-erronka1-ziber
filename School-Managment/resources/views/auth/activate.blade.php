@@ -5,14 +5,17 @@
 @section('content')
 <section class="container auth">
     <div class="auth__copy">
-        <span class="kicker fx-fade">{{ __('activación // cuenta de alumno') }}</span>
+        @php
+            $teacher = $student->isTeacher();
+        @endphp
+        <span class="kicker fx-fade">{{ $teacher ? __('activación // cuenta de profesor') : __('activación // cuenta de alumno') }}</span>
         <h1 class="h-hero"><span class="fx-type">{{ __('Hola, :name.', ['name' => $student->name]) }}<span class="cursor" aria-hidden="true"></span></span></h1>
-        <p class="lead fx-fade" style="--d: 0.9s">{{ __('El centro te ha dado de alta. Elige tu contraseña para activar la cuenta; después podrás matricularte en los cursos.') }}</p>
+        <p class="lead fx-fade" style="--d: 0.9s">{{ $teacher ? __('El centro te ha dado de alta como profesor/a. Elige tu contraseña para activar la cuenta.') : __('El centro te ha dado de alta. Elige tu contraseña para activar la cuenta; después podrás matricularte en los cursos.') }}</p>
         <ol class="steps fx-fade" style="--d: 1.1s">
             <li class="is-done">{{ __('el centro te da de alta') }}</li>
             <li class="is-done">{{ __('abres el enlace del email') }}</li>
             <li class="is-now">{{ __('eliges tu contraseña') }}</li>
-            <li>{{ __('te matriculas en tus cursos') }}</li>
+            <li>{{ $teacher ? __('entras en tu cuenta') : __('te matriculas en tus cursos') }}</li>
         </ol>
     </div>
 

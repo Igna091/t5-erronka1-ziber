@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminCourseController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EnrollmentController;
 use App\Http\Controllers\Admin\StudentController;
+use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
@@ -99,6 +100,12 @@ Route::middleware(['auth', 'admin'])->prefix('administracion')->name('admin.')->
         'destroy' => 'students.destroy',
     ])->parameters(['alumnos' => 'student']);
     Route::post('/alumnos/{student}/reenviar-activacion', [StudentController::class, 'resendActivation'])->name('students.resend-activation');
+
+    // Teachers
+    Route::get('/profesores/crear', [TeacherController::class, 'create'])->name('teachers.create');
+    Route::post('/profesores', [TeacherController::class, 'store'])->name('teachers.store');
+    Route::get('/profesores/{teacher}', [TeacherController::class, 'show'])->name('teachers.show');
+    Route::post('/profesores/{teacher}/reenviar-activacion', [TeacherController::class, 'resendActivation'])->name('teachers.resend-activation');
 
     // Pending account activations
     Route::get('/activaciones', [ActivationController::class, 'index'])->name('activations.index');

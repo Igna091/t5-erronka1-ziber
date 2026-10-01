@@ -273,6 +273,152 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ==========================================
+    // Dropdowns: the browser's own option list can't be styled (some draw it see-through),
+    // so every select.form-select gets a list drawn here. The real <select> stays hidden in
+    // the form: it keeps the value that is sent and fires the usual "change" event.
+    // ==========================================
+    document.querySelectorAll('select.form-select').forEach(function (select, n) {
+        const listId = 'select-list-' + n;
+        const label = select.id ? document.querySelector('label[for="' + select.id + '"]') : null;
+        const optionText = function (option) { return option.textContent.replace(/\s+/g, ' ').trim(); };
+
+        const wrap = document.createElement('div');
+        wrap.className = 'select';
+        select.parentNode.insertBefore(wrap, select);
+
+        // Same classes as the select (form-select, is-invalid...), so it looks like the field
+        const box = document.createElement('div');
+        box.className = select.className + ' select__box';
+        box.tabIndex = 0;
+        box.setAttribute('role', 'combobox');
+        box.setAttribute('aria-haspopup', 'listbox');
+        box.setAttribute('aria-expanded', 'false');
+        box.setAttribute('aria-controls', listId);
+        const value = document.createElement('span');
+        value.className = 'select__value';
+        box.appendChild(value);
+
+        const list = document.createElement('ul');
+        list.className = 'select__list';
+        list.id = listId;
+        list.setAttribute('role', 'listbox');
+        list.hidden = true;
+
+        if (label) {
+            label.id = label.id || select.id + '-label';
+            box.setAttribute('aria-labelledby', label.id);
+            list.setAttribute('aria-labelledby', label.id);
+            label.addEventListener('click', function (e) {
+                e.preventDefault();
+                box.focus();
+            });
+        } else if (select.hasAttribute('aria-label')) {
+            box.setAttribute('aria-label', select.getAttribute('aria-label'));
+        }
+
+        const items = Array.from(select.options).map(function (option, i) {
+            const item = document.createElement('li');
+            item.id = listId + '-' + i;
+            item.className = 'select__option';
+            item.setAttribute('role', 'option');
+            item.textContent = optionText(option);
+            if (option.disabled) item.setAttribute('aria-disabled', 'true');
+            item.addEventListener('click', function () {
+                if (option.disabled) return;
+                choose(i);
+                close();
+            });
+            list.appendChild(item);
+            return item;
+        });
+
+        select.classList.add('select__native');
+        select.tabIndex = -1;
+        wrap.append(select, box, list);
+
+        let active = -1;
+
+        function render() {
+            const option = select.options[select.selectedIndex];
+            value.textContent = option ? optionText(option) : '';
+            box.classList.toggle('is-placeholder', !option || option.value === '');
+            items.forEach(function (item, i) {
+                item.setAttribute('aria-selected', i === select.selectedIndex ? 'true' : 'false');
+            });
+        }
+
+        function setActive(i) {
+            active = i;
+            items.forEach(function (item, j) { item.classList.toggle('is-active', j === i); });
+            if (i >= 0) {
+                box.setAttribute('aria-activedescendant', items[i].id);
+                items[i].scrollIntoView({ block: 'nearest' });
+            } else {
+                box.removeAttribute('aria-activedescendant');
+            }
+        }
+
+        // Next option that can be chosen, from "from" in the direction of "step"
+        function next(from, step) {
+            for (let i = from + step; i >= 0 && i < items.length; i += step) {
+                if (!select.options[i].disabled) return i;
+            }
+            return from;
+        }
+
+        function open() {
+            list.hidden = false;
+            box.setAttribute('aria-expanded', 'true');
+            list.scrollIntoView({ block: 'nearest' });
+            setActive(select.selectedIndex);
+        }
+
+        function close() {
+            list.hidden = true;
+            box.setAttribute('aria-expanded', 'false');
+            setActive(-1);
+        }
+
+        function choose(i) {
+            if (i < 0 || i === select.selectedIndex) return;
+            select.selectedIndex = i;
+            select.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        box.addEventListener('click', function () {
+            if (list.hidden) open(); else close();
+        });
+
+        box.addEventListener('keydown', function (e) {
+            if (list.hidden) {
+                if (['ArrowDown', 'ArrowUp', 'Enter', ' '].indexOf(e.key) !== -1) {
+                    e.preventDefault();
+                    open();
+                }
+                return;
+            }
+
+            if (e.key === 'ArrowDown') setActive(next(active, 1));
+            else if (e.key === 'ArrowUp') setActive(next(active, -1));
+            else if (e.key === 'Home') setActive(next(-1, 1));
+            else if (e.key === 'End') setActive(next(items.length, -1));
+            else if (e.key === 'Enter' || e.key === ' ') { choose(active); close(); }
+            else if (e.key === 'Escape') close();
+            else if (e.key === 'Tab') { close(); return; }
+            else return;
+
+            e.preventDefault();
+        });
+
+        // Clicking the list keeps the focus on the field; clicking anywhere else closes it
+        list.addEventListener('mousedown', function (e) { e.preventDefault(); });
+        box.addEventListener('blur', close);
+        select.addEventListener('change', render);
+
+        render();
+    });
+
+    // ==========================================
     // Course browser: pick a course in the list to show its panel
     // (links still open the course page on small screens or without JS)
     // ==========================================
@@ -296,6 +442,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
             });
         });
+    });
+
+    // ==========================================
+    // New teacher: only the subjects of the chosen course are shown and sent
+    // (without JS every course's subjects are listed; the server checks the course)
+    // ==========================================
+    document.querySelectorAll('[data-course-select]').forEach(function (select) {
+        const groups = select.form.querySelectorAll('[data-course-subjects]');
+
+        function update() {
+            groups.forEach(function (group) {
+                const shown = group.getAttribute('data-course-subjects') === select.value;
+                group.hidden = !shown;
+                group.querySelectorAll('input').forEach(function (input) { input.disabled = !shown; });
+            });
+        }
+
+        select.addEventListener('change', update);
+        update();
     });
 
     // ==========================================

@@ -83,7 +83,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Resend the activation email to a pending student.
+     * Resend the activation email to a pending student or teacher.
      * The answer is always the same, so it doesn't reveal which emails exist.
      */
     public function register(Request $request, AccountActivation $activation)
@@ -98,7 +98,7 @@ class AuthController extends Controller
         // running out of the mail provider's daily quota. The admin can still resend.
         $dailyKey = 'activation-resend:'.strtolower($validated['email']);
 
-        if (($student = $activation->pendingStudent($validated['email']))
+        if (($student = $activation->pendingAccount($validated['email']))
             && !RateLimiter::tooManyAttempts($dailyKey, self::PUBLIC_RESENDS_PER_DAY)) {
             try {
                 if ($activation->send($student)) {
@@ -119,7 +119,7 @@ class AuthController extends Controller
     public function showActivate(Request $request, string $token, AccountActivation $activation)
     {
         $email = $request->string('email')->toString();
-        $student = $activation->pendingStudent($email);
+        $student = $activation->pendingAccount($email);
 
         if (!$student || !$activation->isValid($student, $token)) {
             return redirect()->route('register')->with('error', __(self::INVALID_LINK_MESSAGE));
@@ -139,7 +139,7 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', Password::min(8)->letters()->numbers()],
         ]);
 
-        $student = $activation->pendingStudent($validated['email']);
+        $student = $activation->pendingAccount($validated['email']);
 
         if (!$student || !$activation->isValid($student, $validated['token'])) {
             return back()->withErrors(['email' => __(self::INVALID_LINK_MESSAGE)]);

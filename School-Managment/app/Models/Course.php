@@ -72,6 +72,15 @@ class Course extends Model
     }
 
     /**
+     * Get the teachers assigned to the whole course.
+     */
+    public function teachers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'course_teacher', 'course_id', 'teacher_id')
+            ->withTimestamps();
+    }
+
+    /**
      * Get the course subject rows (subject + teacher) of this course.
      */
     public function courseSubjects(): HasMany

@@ -120,4 +120,43 @@
         @endif
     </section>
 </div>
+
+<section class="panel fx-fade" style="--d: 0.5s">
+    <div class="panel__head">
+        <h2 class="lbl">{{ __('profesorado') }}</h2>
+        <a href="{{ route('admin.teachers.create', ['course_id' => $course->id]) }}" class="btn btn-outline btn-sm"><x-icon name="plus" :size="14" />{{ __('nuevo profesor') }}</a>
+    </div>
+    @if ($course->teachers->isNotEmpty() || $course->courseSubjects->isNotEmpty())
+        <div style="overflow-x: auto;">
+            <table class="table">
+                <thead><tr><th>{{ __('asignatura') }}</th><th>{{ __('profesor/a') }}</th></tr></thead>
+                <tbody>
+                    @foreach ($course->teachers as $teacher)
+                        <tr>
+                            <td class="t-sub">{{ __('curso entero') }}</td>
+                            <td><a href="{{ route('admin.teachers.show', $teacher) }}" style="color: var(--text); text-decoration: none;">{{ $teacher->full_name }}</a></td>
+                        </tr>
+                    @endforeach
+                    @foreach ($course->courseSubjects as $item)
+                        <tr>
+                            <td><span class="t-code">{{ $item->subject->code }}</span>&nbsp;&nbsp;{{ $item->subject->name }}</td>
+                            <td>
+                                @if ($item->teacher)
+                                    <a href="{{ route('admin.teachers.show', $item->teacher) }}" style="color: var(--text); text-decoration: none;">{{ $item->teacher->full_name }}</a>
+                                @else
+                                    <span class="t-sub">{{ __('por asignar') }}</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @else
+        <div class="empty">
+            <span class="empty__cmd">ls {{ __('profesorado') }}/ <span class="muted">— {{ __('vacío') }}</span></span>
+            <span>{{ __('Este curso todavía no tiene profesores ni asignaturas.') }}</span>
+        </div>
+    @endif
+</section>
 @endsection

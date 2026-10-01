@@ -445,6 +445,30 @@ a:hover { color: var(--text); }
     background-position: calc(100% - 1.25rem) 50%, calc(100% - 0.9rem) 50%;
     background-size: 6px 6px; background-repeat: no-repeat;
 }
+/* Without JS the browser draws the option list: give it the theme colours where it allows it */
+.form-select option { background-color: var(--bg); color: var(--text); font-family: var(--font-mono); }
+.form-select option:checked { background-color: var(--acc); color: var(--acc-ink); }
+.form-select option:disabled { color: var(--muted); }
+
+/* Dropdown drawn by app.js: .select__box looks like the field, the real <select> stays hidden in the form */
+.select { position: relative; }
+.select__native { display: none; }
+.select__box { display: flex; align-items: center; user-select: none; }
+.select__box[aria-expanded="true"] { border-color: var(--acc); }
+.select__value { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.select__box.is-placeholder .select__value { color: var(--placeholder); }
+.select__list {
+    position: absolute; left: 0; right: 0; top: calc(100% + 0.375rem); z-index: 40;
+    max-height: 18rem; overflow-y: auto; margin: 0; padding: 0.375rem; list-style: none;
+    border: 1px solid var(--line-2); background: var(--panel-solid); box-shadow: var(--shadow);
+    font-family: var(--font-mono); font-size: 0.875rem;
+}
+.select__list[hidden] { display: none; }
+.select__option { padding: 0.75rem 0.875rem; color: var(--text-2); cursor: pointer; }
+.select__option:hover, .select__option.is-active { background: var(--acc-soft); color: var(--text); }
+.select__option[aria-selected="true"] { color: var(--acc); }
+.select__option[aria-selected="true"]::before { content: "> "; }
+.select__option[aria-disabled="true"] { color: var(--muted); background: none; cursor: not-allowed; }
 .form-input::placeholder, .form-textarea::placeholder { color: var(--placeholder); }
 .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-ring); }
 .form-input:disabled, .form-input[readonly] { color: var(--text-2); background: var(--chip); border-style: dashed; }
@@ -723,6 +747,15 @@ a.enrol-card:hover { border-color: var(--acc); color: var(--text); transform: tr
 
 .form-card { max-width: 52rem; }
 .form-card .panel__body { padding: 2rem; gap: 1.5rem; }
+/* Second section of a form card (new teacher: what they teach) */
+.form-card .panel__body + .panel__head { border-top: 1px solid var(--line); }
+.form fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.form legend { padding: 0; margin-bottom: 0.75rem; }
+.form-row--3 { grid-template-columns: 8rem minmax(0, 1fr) 7rem; }
+
+/* New teacher: subjects of each course (with JS, only the chosen course's are shown) */
+.subject-picks { display: flex; flex-direction: column; }
+.subject-picks[hidden] { display: none; }
 
 /* Pagination (vendor/pagination/senal.blade.php) */
 .pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; font-size: 0.8125rem; color: var(--muted); }

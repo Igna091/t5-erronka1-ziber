@@ -1,9 +1,9 @@
 <x-mail::message>
-<x-mail::kicker>{{ __('activación // cuenta de alumno') }}</x-mail::kicker>
+<x-mail::kicker>{{ $teacher ? __('activación // cuenta de profesor') : __('activación // cuenta de alumno') }}</x-mail::kicker>
 
 # {{ __('¡Hola, :name!', ['name' => $name]) }}
 
-{{ __('El centro te ha dado de alta como alumno/a en ZiberEibar.') }} {{ __('Para empezar, activa tu cuenta y elige tu contraseña:') }}
+{{ $teacher ? __('El centro te ha dado de alta como profesor/a en ZiberEibar.') : __('El centro te ha dado de alta como alumno/a en ZiberEibar.') }} {{ __('Para empezar, activa tu cuenta y elige tu contraseña:') }}
 
 <x-mail::button :url="$actionUrl" align="left">
 {{ $actionText }}
@@ -17,7 +17,7 @@
     __('el centro te da de alta'),
     __('abres el enlace del email'),
     __('eliges tu contraseña'),
-    __('te matriculas en tus cursos'),
+    $teacher ? __('entras en tu cuenta') : __('te matriculas en tus cursos'),
 ]" />
 
 {{ __('Si no esperabas este correo, puedes ignorarlo.') }}
